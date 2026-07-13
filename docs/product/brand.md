@@ -1,13 +1,18 @@
 # Brand system
 
+**Katalume** is pronounced “kat-uh-LOOM.” The name combines **kata**, deliberate
+practice that forges mastery, with **lume**, light or illumination—the moment a
+hard problem clicks.
+
 ## Ensemble Spark
 
-The original MLBoost mark shows three learner signals converging into one
-amplified result. It represents ensemble learning and the lift implied by
-“Boost.” The vector geometry was created specifically for MLBoost rather than
+The original Katalume mark shows three practice paths converging into one
+illuminated result. It connects the rigor of repeated kata with the moment of
+insight at the heart of lume, while retaining a subtle reference to ensemble
+learning. The vector geometry was created specifically for Katalume rather than
 adapted from a stock icon.
 
-![MLBoost Ensemble Spark](../assets/mlboost-mark.svg){ width="160" }
+![Katalume Ensemble Spark](../assets/katalume-mark.svg){ width="160" }
 
 ## Color
 
@@ -29,7 +34,7 @@ adapted from a stock icon.
 - Preserve at least one input-node diameter of clear space.
 - Minimum recommended digital size: 24 × 24 CSS pixels.
 - Do not rotate, stretch, recolor individual paths, or place text inside the tile.
-- Pair with the wordmark `MLBoost` in Plus Jakarta Sans, weight 700.
+- Pair with the wordmark `Katalume` in Plus Jakarta Sans, weight 700.
 
 ## Legal clearance
 

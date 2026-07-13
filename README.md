@@ -1,7 +1,13 @@
-# MLBoost documentation
+# Katalume documentation
 
-The authoritative product and engineering documentation for MLBoost, an
-interactive machine-learning and data-science practice platform.
+**Practice machine learning into mastery.**
+
+Katalume is the training ground for machine learning — solve real ML problems
+in an in-browser judge, compete in contests, and climb to mastery. LeetCode
+rigor meets Kaggle depth.
+
+The name combines **kata**, deliberate practice that forges mastery, with
+**lume**, light or illumination—the moment a hard problem clicks.
 
 This repository documents the current product, the frontend and backend
 architecture, every API, environment configuration, development workflow,
@@ -21,8 +27,8 @@ Open `http://127.0.0.1:8000`.
 
 ## Source of truth
 
-- Product behavior: private `frontend` repository
-- API behavior: private `backend-api` repository
+- Product behavior: public `frontend` repository
+- API behavior: public `backend-api` repository
 - Product and operational documentation: this repository
 - Launch gates: [`docs/launch/readiness.md`](docs/launch/readiness.md)
 - Deadline plan: [`docs/launch/july-20-plan.md`](docs/launch/july-20-plan.md)

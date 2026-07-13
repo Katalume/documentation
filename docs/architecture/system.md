@@ -31,7 +31,7 @@ server-only backend origin are required by the Vercel production build.
 4. **Data:** MongoDB and distributed-rate-limit Redis are private.
 5. **Execution:** separate workers and authenticated Judge0 execute adversarial
    code with CPU, memory, wall-time, file-size, language, and payload limits.
-6. **Operations:** private repositories, CI/CD, secrets, audit events, logs,
+6. **Operations:** public repositories, CI/CD, secrets, audit events, logs,
    metrics, alerts, backups, and administrative access.
 
 ## Authentication flow
@@ -39,7 +39,7 @@ server-only backend origin are required by the Vercel production build.
 1. Browser posts credentials to same-origin `/api/auth/login` or `/signup`.
 2. Next.js forwards server-to-server to Express.
 3. Express creates a hashed, tracked Session and sets short-lived
-   `mlboost_access` plus rotating `mlboost_session` HttpOnly cookies.
+   `katalume_access` plus rotating `katalume_session` HttpOnly cookies.
 4. Browser-readable access tokens are not returned in production or persisted.
 5. Every API authorization verifies the access JWT and live Session record.
 6. Refresh rotates the session; reuse revokes all active sessions for the user.

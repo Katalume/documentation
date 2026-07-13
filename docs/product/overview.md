@@ -2,9 +2,14 @@
 
 ## Mission
 
-MLBoost helps learners and interview candidates build practical ML engineering
-fluency through short, judgeable programming problems rather than passive
-content alone.
+**Practice machine learning into mastery.**
+
+Katalume is the training ground for machine learning — solve real ML problems
+in an in-browser judge, compete in contests, and climb to mastery. LeetCode
+rigor meets Kaggle depth.
+
+The name combines **kata**, deliberate practice that forges mastery, with
+**lume**, light or illumination—the moment a hard problem clicks.
 
 ## Product pillars
 
@@ -45,5 +50,5 @@ content alone.
 
 The current deployment must not be marketed as a fully live judge until P0
 launch gates close. Billing, team/organization administration, email
-verification, password recovery, plagiarism detection, and durable async
-judging are not complete production capabilities.
+verification, password recovery, and plagiarism detection are not complete
+production capabilities.

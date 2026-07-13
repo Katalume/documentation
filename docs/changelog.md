@@ -8,11 +8,12 @@
 - Pinned Node 24, built non-root production images, reduced production audits to
   zero findings, added full-history secret scanning and Dependabot.
 - Container-verified BFF/API/Mongo/Redis/worker/Judge lifecycle and privacy headers.
-- Made all six organization repositories private and removed repository links
-  from generated/public websites.
-- Published private frontend PR 31 and backend PR 22 with green application,
-  container and secret-scan Actions gates; recorded GitHub/Vercel private-plan
-  limitations as explicit release blockers.
+- Made all six organization repositories public while keeping repository links
+  out of the product website.
+- Merged frontend PRs 31/32 and backend PR 22 with green application,
+  deployment, container, and secret-scan gates.
+- Rebranded the product as Katalume across code, configuration, metadata,
+  tests, documentation, and the visual identity assets.
 
 - Bootstrapped the complete documentation repository.
 - Documented product scope, user journeys, current state, and brand system.

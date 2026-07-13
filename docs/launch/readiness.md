@@ -7,7 +7,7 @@
 
 | Gate | Current evidence | State |
 |---|---|---:|
-| Private source | All six repos private; anonymous API returns 404 | Closed |
+| Repository visibility | All six repos public; product UI contains no repository links | Closed |
 | Browser/API boundary | Same-origin BFF; no production bearer response/storage | Closed |
 | Session security | Tracked hashes, rotation, reuse detection, revocation checks | Closed |
 | Run/submit contract | `202`, job/submission polling, live contract tests | Closed |
@@ -18,10 +18,10 @@
 | Runtime/dependencies | Node 24; zero production audit findings; non-root images | Closed |
 | Abuse/input | Redis distributed limits, per-user quota, unsafe-key rejection | Closed in code |
 | Data/content | Migration, indexes, pagination, version-switched testcases | Closed in code |
-| CI/security | PR 22/31 Actions gates, audits, images, Gitleaks, Dependabot | Closed in code; Vercel plan gate open |
-| Branch/release protection | GitHub rejects protection for private org repos on current plan | Owner/platform gate |
+| CI/security | PRs 22/31/32 merged with green Actions, deployment, audits, images, Gitleaks, Dependabot | Closed in code |
+| Branch/release protection | Required checks, review rules and release approvals need owner configuration | Owner/platform gate |
 | Production infrastructure | Managed Mongo/Redis/API/worker/private Judge0 | Open |
-| Production configuration | HTTPS URLs, live/no fallback, secrets, Sentry, private Vercel plan | Open |
+| Production configuration | HTTPS URLs, live/no fallback, secrets and Sentry | Open |
 | Identity lifecycle | Email verification/recovery and Admin MFA | Open |
 | Observability | Central metrics/traces/errors/alerts and on-call routing | Open |
 | Recovery/capacity | Restore, rollback, resilience and 2× peak load drills | Open |
@@ -42,8 +42,8 @@
 
 - Select/provision domains, cloud services, secrets, mail/identity, monitoring,
   support/status and backup retention.
-- Upgrade the organization plan (or move to an equivalent private host) so
-  protected branches and private-org Vercel deployments are available.
+- Configure protected branches, required checks, release approvals, and the
+  production deployment environment.
 - Approve legal/privacy/acceptable-use/retention terms, content/dataset rights,
   trademark clearance, analytics consent and commercial policy.
 - Establish expected beta peak, SLOs/error budgets, cost ceilings and on-call.
@@ -61,9 +61,8 @@
 - Gitleaks: frontend clean; backend clean after two exact documented legacy
   fingerprints, with no broad rule/path exclusions
 - Documentation strict build green
-- Backend PR 22 and frontend PR 31 contain the reviewed hardening branches;
-  GitHub Actions code gates are green. Vercel's private-org Hobby-plan status is
-  an explicit platform failure, not an application test failure.
+- Backend PR 22 and frontend PRs 31/32 are merged; GitHub Actions code gates are
+  green and the frontend preview deployment completed successfully.
 
 ## Go/no-go rule
 

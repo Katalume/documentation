@@ -1,4 +1,4 @@
-# Contributing to MLBoost documentation
+# Contributing to Katalume documentation
 
 ## Principles
 

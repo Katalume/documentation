@@ -4,8 +4,8 @@
 
 | Credential | Transport | Lifetime | Server state |
 |---|---|---:|---|
-| Access JWT | `mlboost_access` Secure/HttpOnly cookie | 15 minutes | References Session `sid` |
-| Refresh JWT | `mlboost_session` Secure/HttpOnly cookie | 7 days | SHA-256 hash, expiry, device metadata, revocation/replacement |
+| Access JWT | `katalume_access` Secure/HttpOnly cookie | 15 minutes | References Session `sid` |
+| Refresh JWT | `katalume_session` Secure/HttpOnly cookie | 7 days | SHA-256 hash, expiry, device metadata, revocation/replacement |
 
 Production browser authentication is cookie-only. Bearer authorization is
 disabled by default in production and remains available only for local/test

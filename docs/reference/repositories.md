@@ -2,12 +2,12 @@
 
 ## Active repositories
 
-### `MLBoost2025/frontend`
+### `Katalume/frontend`
 
 - Next.js/React product
 - Default branch: `develop`
 - Release mirror/production branch: `main`
-- Private repository; production-hardening draft PR 31 is under review
+- Public repository; hardening PR 31 is merged to `develop` and sync PR 32 is merged to `main`
 
 Key paths:
 
@@ -19,11 +19,11 @@ Key paths:
 - `src/proxy.ts` — route/session validation
 - `e2e` — Playwright flows
 
-### `MLBoost2025/backend-api`
+### `Katalume/backend-api`
 
 - Express/Mongoose/Judge0 API
 - Default branch: `main`
-- Private repository; production-hardening draft PR 22 is under review
+- Public repository; hardening PR 22 is merged to `main`
 
 Key paths:
 
@@ -35,13 +35,13 @@ Key paths:
 - `src/workers` — evaluation worker entrypoint
 - `tests` — Jest/Supertest integration tests
 
-### `MLBoost2025/documentation`
+### `Katalume/documentation`
 
 - Product, engineering, API, operations, and launch source of truth
 - Default branch: `main`
 - Built with MkDocs Material
 
-All six organization repositories are private. `evaluation-engine` and
+All six organization repositories are public. `evaluation-engine` and
 `ml-problems` remain reserved/empty; active evaluation/content implementations
 currently live in `backend-api`.
 
@@ -60,5 +60,5 @@ repositories should remain reserved or be archived once ownership is decided.
   bootstrap and this production-readiness synchronization.
 
 No default branch should accept force pushes or bypass required checks for normal
-delivery. GitHub currently rejects private-organization branch protection on the
-active plan; upgrading the plan is a release gate, not a reason to expose source.
+delivery. Configure required checks, review requirements, and release approvals
+before opening the public beta.

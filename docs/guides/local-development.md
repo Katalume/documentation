@@ -10,7 +10,7 @@
 ## Clone layout
 
 ```text
-mlboost/
+katalume/
 ├── frontend/
 ├── backend-api/
 └── documentation/

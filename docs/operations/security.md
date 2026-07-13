@@ -31,7 +31,7 @@
 - Configure Judge0 auth, deny network, bound resources/queues, disable unused APIs.
 - Retain Node 24 and zero-finding production audit gates.
 - Rotate all credentials ever exposed during development.
-- Protect private repository branches and production deployments.
+- Protect repository branches and production deployments.
 
 ## Web controls
 
@@ -47,14 +47,14 @@
 
 - Dependabot/Renovate and dependency review
 - `npm audit` gate and license review
-- Full-history Gitleaks scanning and private-plan-compatible SAST review
+- Full-history Gitleaks scanning and SAST review
 - SBOM per release
 - Container image scanning and signed provenance
 - Pin Actions and base images to reviewed versions/digests
 
 ## Privacy
 
-MLBoost stores identity, source code, submissions, progress, and potentially
+Katalume stores identity, source code, submissions, progress, and potentially
 analytics. Before public collection, publish privacy/retention policies,
 implement export/deletion, minimize telemetry, restrict staff access, and define
 breach notification procedures.

@@ -2,7 +2,7 @@
 
 ## Our standard
 
-MLBoost contributors must communicate respectfully, review work on its merits,
+Katalume contributors must communicate respectfully, review work on its merits,
 protect user safety and privacy, and make the project welcoming regardless of
 experience, identity, background, or location.
 

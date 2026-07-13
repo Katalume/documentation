@@ -25,9 +25,9 @@ clusters, secrets, DSNs, analytics properties, and domains.
 ## Production topology recommendation
 
 ```text
-app.mlboost.<tld>       -> Vercel frontend
-api.mlboost.<tld>       -> API load balancer
-status.mlboost.<tld>    -> independent status page
+app.katalume.com         -> Vercel frontend
+api.katalume.com         -> API load balancer
+status.katalume.com      -> independent status page
 MongoDB / Redis / Judge0 -> private networks only
 ```
 

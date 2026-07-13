@@ -16,18 +16,17 @@
 - Request IDs, structured logs, Admin audit, liveness/readiness
 - Node 24 non-root frontend/backend images and zero production audit findings
 - CSP/HSTS/privacy headers, metadata, robots and sitemap
-- Full-history secret scanning and private visibility for all six repositories
+- Full-history secret scanning and public visibility for all six repositories
 - Container smoke: BFF → API → Mongo/Redis → worker → Judge simulator → verdict
-- Private draft PRs 31 (frontend) and 22 (backend) published with green Actions
+- Frontend PRs 31/32 and backend PR 22 merged with green Actions and deployment checks
 
 ## Hosted state still requiring deployment work
 
 - Existing Vercel production alias predates this hardening and lacks required
   production configuration.
-- The current Vercel Hobby connection rejects private organization repositories;
-  use an eligible private plan or a different private deployment platform.
-- GitHub branch protection for private organization repositories is unavailable
-  on the current plan; upgrade before release rather than making source public.
+- The merged frontend was preview-deployed successfully after repository
+  visibility changed; production still needs explicit environment configuration.
+- Required branch rules and release approvals still need owner configuration.
 - No managed production backend/worker/Judge0 deployment is recorded.
 - No custom domain, centralized monitoring evidence, backup restore, load test,
   or rollback drill is recorded.

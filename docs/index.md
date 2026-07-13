@@ -1,16 +1,17 @@
-# MLBoost documentation
+# Katalume documentation
 
-MLBoost is a browser-based platform for practicing machine-learning and
-data-science problems: **LeetCode rigor with Kaggle depth**.
+**Practice machine learning into mastery.**
 
-Users solve problems in an in-browser editor, run code against custom input,
-submit against hidden tests, follow curated learning tracks, join competitions,
-and measure progress. Administrators manage problems, contests, and learning
-tracks inside the product.
+Katalume is the training ground for machine learning — solve real ML problems
+in an in-browser judge, compete in contests, and climb to mastery. LeetCode
+rigor meets Kaggle depth.
+
+The name combines **kata**, deliberate practice that forges mastery, with
+**lume**, light or illumination—the moment a hard problem clicks.
 
 !!! warning "Launch status — 2026-07-13"
     The application-side P0 architecture is implemented and container-verified,
-    but MLBoost is **not yet ready for unrestricted production traffic** until
+    but Katalume is **not yet ready for unrestricted production traffic** until
     managed infrastructure, production secrets/configuration, restore/load
     drills, monitoring, and release approvals are completed. See
     [Production readiness](launch/readiness.md).
@@ -47,8 +48,8 @@ Production hosting and observability remain deployment gates.
 
 | Repository | Purpose | Canonical branch/state |
 |---|---|---|
-| `frontend` | Next.js product and same-origin BFF | Private; production-hardening branch pending review |
-| `backend-api` | Express/Mongo/evaluation worker/Judge0 API | Private; production-hardening branch pending review |
+| `frontend` | Next.js product and same-origin BFF | Public; hardening merged to `develop` and synced to `main` |
+| `backend-api` | Express/Mongo/evaluation worker/Judge0 API | Public; hardening merged to `main` |
 | `documentation` | This source of truth | `main` |
 
-All six organization repositories are private as of 2026-07-13.
+All six organization repositories are public as of 2026-07-13.

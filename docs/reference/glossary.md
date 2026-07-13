@@ -11,14 +11,14 @@
   Judge0 completes, while workers durably finalize results.
 
 **Blue Eclipse**
-: MLBoost's indigo/lavender product palette.
+: Katalume's indigo/lavender product palette.
 
 **Controlled beta**
 : Limited public release with explicit cohort, scope, quotas, monitoring, known
   limitations, and rollback gates.
 
 **Ensemble Spark**
-: MLBoost's original brand mark: three learner signals converging into one
+: Katalume's original brand mark: three learner signals converging into one
   amplified result.
 
 **Hidden test**

@@ -2,7 +2,7 @@
 
 ## Create an account
 
-1. Open the public MLBoost landing page.
+1. Open the public Katalume landing page.
 2. Choose **Get started**.
 3. Select **Sign up**.
 4. Enter a display name, email address, and password of at least eight characters.

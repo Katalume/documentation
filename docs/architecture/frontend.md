@@ -35,5 +35,5 @@ deduplication handled by server-side rotation.
   flows without depending on external services.
 
 Mock mode and localStorage are isolated to deterministic demo/test data only.
-The approved Blue Eclipse/Ensemble Spark UI is unchanged except removal of the
-public organization link required by private-repository policy.
+The approved Blue Eclipse/Ensemble Spark UI remains product-focused and does not
+surface organization or repository links.

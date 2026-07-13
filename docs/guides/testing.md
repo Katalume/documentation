@@ -10,7 +10,7 @@ npm run test:unit
 npm run build
 npm run test:e2e
 npm run audit:production
-docker build -t mlboost-frontend .
+docker build -t katalume-frontend .
 ```
 
 Verified source baseline: eight Vitest files with live BFF/session/run/submit
@@ -29,7 +29,7 @@ terminal contract.
 npm ci
 npm test -- --coverage
 npm audit --omit=dev --audit-level=high
-docker build -t mlboost-backend .
+docker build -t katalume-backend .
 ```
 
 Verified baseline: 20 suites / 115 tests; 83.13% statements, 68.32% branches,

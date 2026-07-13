@@ -23,7 +23,7 @@ For the July 20 beta:
 
 - Name accountable owner for frontend, API, execution, data, security, and launch.
 - Freeze UI except P0 correctness/accessibility regressions.
-- Protect private repository branches and required checks.
+- Protect repository branches and require the verified checks.
 - Move CI/Docker to Node 24 LTS.
 - Patch frontend high dependency findings.
 - Finalize domains, hosting, managed Mongo, Redis, Judge0 host, Sentry, email.
@@ -31,9 +31,9 @@ For the July 20 beta:
 
 **Exit:** owners and environments exist; no ambiguity about beta scope.
 
-The Node 24, dependency and CI work is complete in PRs 22/31. Branch protection
-and private-org Vercel deployment require a paid/private-capable plan and remain
-owner/platform gates; do not resolve either by making repositories public.
+The Node 24, dependency and CI work is complete in merged PRs 22/31/32. The
+repositories are public and Vercel preview deployment is working; branch rules
+and production environment configuration remain owner/platform gates.
 
 ### July 14 — staging foundation
 

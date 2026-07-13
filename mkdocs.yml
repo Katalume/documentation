@@ -1,10 +1,10 @@
-site_name: MLBoost Documentation
-site_description: Product, engineering, API, deployment, and operations documentation for MLBoost
+site_name: Katalume Documentation
+site_description: Product, engineering, API, deployment, and operations documentation for Katalume
 
 theme:
   name: material
-  logo: assets/mlboost-mark.svg
-  favicon: assets/mlboost-mark.svg
+  logo: assets/katalume-mark.svg
+  favicon: assets/katalume-mark.svg
   font:
     text: Plus Jakarta Sans
     code: Space Mono
