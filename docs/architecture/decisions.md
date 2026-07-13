@@ -32,23 +32,25 @@ separate, private, privileged execution subsystem.
 Blue Eclipse is the canonical product palette; Plus Jakarta Sans and Space Mono
 are the type system. Ensemble Spark is the canonical mark.
 
-## Required before launch
-
 ### ADR-006 — Durable async execution
 
-Adopt Redis-backed durable jobs with API/worker separation, idempotency,
-bounded retries, dead-letter handling, and reconciliation.
+Use Mongo-backed durable EvaluationJobs with API/worker separation, atomic
+leases and heartbeats, idempotency, bounded retries, dead-letter handling, and
+reconciliation. Redis is reserved for distributed rate limits.
 
-### ADR-007 — Revocable sessions
+### ADR-007 — Revocable cookie sessions and BFF
 
-Use short-lived access tokens and rotated, hashed, server-tracked refresh
-sessions. Do not store live bearer tokens persistently in browser storage.
+Use short-lived cookie access tokens and rotated, hashed, server-tracked refresh
+Sessions. Route live browser API traffic through the same-origin Next.js BFF;
+never persist or return production bearer credentials to browser JavaScript.
+
+## Required before launch
 
 ### ADR-008 — Controlled launch scope
 
 If the July 20 deadline is immovable, ship a controlled beta with a single
-language, strict execution quotas, and competitions disabled until real scoring
-and contest attribution pass staging tests.
+language, strict execution quotas, reviewed competition rules, and staged
+traffic only after production-like evidence passes.
 
 ### ADR-009 — Environment promotion
 

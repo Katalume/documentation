@@ -9,11 +9,11 @@ and measure progress. Administrators manage problems, contests, and learning
 tracks inside the product.
 
 !!! warning "Launch status — 2026-07-13"
-    The product UI and mock experience are strong, but MLBoost is **not yet ready
-    for unrestricted public production traffic**. The frontend production
-    deployment currently has no live environment variables, no backend
-    production deployment is recorded, and the execution/auth/contest systems
-    have P0 launch work. See [Production readiness](launch/readiness.md).
+    The application-side P0 architecture is implemented and container-verified,
+    but MLBoost is **not yet ready for unrestricted production traffic** until
+    managed infrastructure, production secrets/configuration, restore/load
+    drills, monitoring, and release approvals are completed. See
+    [Production readiness](launch/readiness.md).
 
 ## Where to begin
 
@@ -30,25 +30,25 @@ tracks inside the product.
 
 ```mermaid
 flowchart LR
-    U["Learner or admin"] --> F["Next.js frontend"]
-    F --> A["Express API"]
+    U["Learner or admin"] --> F["Next.js frontend + same-origin BFF"]
+    F --> A["Private Express API"]
     A --> M[("MongoDB")]
-    A --> Q["Execution queue — required"]
-    Q --> W["Judge worker — required"]
+    A --> Q["Durable Mongo evaluation jobs"]
+    Q --> W["Separate judge worker"]
     W --> J["Private Judge0 cluster"]
     F -. telemetry .-> S["Sentry / analytics"]
     A -. metrics and logs .-> O["Observability stack — required"]
 ```
 
-Solid paths describe implemented request flows. Components marked “required”
-represent the target production architecture; current judging is synchronous.
+Solid paths describe the implemented, locally container-verified request flow.
+Production hosting and observability remain deployment gates.
 
 ## Current repositories
 
 | Repository | Purpose | Canonical branch/state |
 |---|---|---|
-| `frontend` | Next.js product | `develop` at `ccd6503`; logo PR #30 merged |
-| `backend-api` | Express/Mongo/Judge0 API | `main` at `d144514` |
+| `frontend` | Next.js product and same-origin BFF | Private; production-hardening branch pending review |
+| `backend-api` | Express/Mongo/evaluation worker/Judge0 API | Private; production-hardening branch pending review |
 | `documentation` | This source of truth | `main` |
 
-Frontend `main` remains one logo commit behind `develop` as of this snapshot.
+All six organization repositories are private as of 2026-07-13.

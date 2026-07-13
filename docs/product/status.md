@@ -2,47 +2,41 @@
 
 **Snapshot:** 2026-07-13
 
-## Delivery summary
+## Implemented and verified locally
 
-### Frontend
+- Approved Blue Eclipse/Ensemble Spark product UI retained
+- Same-origin Next.js BFF with production cookie-only sessions
+- Rotating/revocable Session records and account lifecycle operations
+- Durable Mongo evaluation jobs, separate worker, retry/dead-letter/heartbeat
+- Async Judge0 polling with resource limits and bounded concurrency
+- Idempotent submission/status/cancellation contract
+- Contest eligibility, attribution and exactly-once first-solve scoring
+- Atomic-version testcase authoring and JSON program I/O contract
+- Distributed Redis throttling, per-user execution quota, input guard
+- Request IDs, structured logs, Admin audit, liveness/readiness
+- Node 24 non-root frontend/backend images and zero production audit findings
+- CSP/HSTS/privacy headers, metadata, robots and sitemap
+- Full-history secret scanning and private visibility for all six repositories
+- Container smoke: BFF → API → Mongo/Redis → worker → Judge simulator → verdict
+- Private draft PRs 31 (frontend) and 22 (backend) published with green Actions
 
-- Latest canonical development commit: `ccd6503`
-- Ensemble Spark identity merged in PR #30
-- Blue Eclipse palette with Space Mono and Plus Jakarta Sans
-- 21 Vitest tests and 8 Playwright flows
-- Lint, TypeScript, production build, Vercel preview, and CI green
-- `develop` contains the logo; `main` is still at `71cf79b`
+## Hosted state still requiring deployment work
 
-### Backend
+- Existing Vercel production alias predates this hardening and lacks required
+  production configuration.
+- The current Vercel Hobby connection rejects private organization repositories;
+  use an eligible private plan or a different private deployment platform.
+- GitHub branch protection for private organization repositories is unavailable
+  on the current plan; upgrade before release rather than making source public.
+- No managed production backend/worker/Judge0 deployment is recorded.
+- No custom domain, centralized monitoring evidence, backup restore, load test,
+  or rollback drill is recorded.
+- Email verification/recovery and mandatory Admin MFA are not complete.
+- Two exact passwords existed in removed legacy Judge0 history; scanning now
+  pins only those fingerprints, but any environment that used them must rotate.
 
-- Latest main commit: `d144514`
-- 91 Jest/Supertest tests
-- Measured coverage: 84.3% statements, 67.27% branches, 78.5% functions,
-  84.47% lines
-- Production dependency audit currently reports no known vulnerabilities
-- No production deployment is recorded
+## Readiness
 
-### Hosted state
-
-- Vercel production deployment is Ready at frontend commit `71cf79b`
-- Vercel project has no production environment variables
-- The hosted production alias therefore uses default mock mode
-- No custom domain is configured in the inspected aliases
-
-## Feature readiness
-
-| Capability | UI | API | Production-ready |
-|---|---:|---:|---:|
-| Public landing | Yes | N/A | Yes |
-| Auth basics | Yes | Yes | No — lifecycle/session hardening remains |
-| Problem catalog | Yes | Yes | Near — pagination/performance work remains |
-| Run code | Yes | Yes | No — route mismatch and sync judge |
-| Submit/history | Yes | Yes | No — sync judge and verdict handling |
-| Progress/profile | Yes | Yes | Near — scale/index work remains |
-| Learning tracks | Yes | Yes | Near — catalog QA remains |
-| Admin CRUD | Yes | Yes | No — audit/MFA/validation remains |
-| Competitions | Yes | Partial | No — attribution/scoring incomplete |
-| Observability | Partial | Minimal | No |
-
-The authoritative go/no-go criteria live in
+Application architecture is beta-capable; production infrastructure and owner
+controls are not yet proven. The authoritative decision remains
 [Production readiness](../launch/readiness.md).

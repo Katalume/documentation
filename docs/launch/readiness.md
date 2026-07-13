@@ -1,99 +1,74 @@
 # Production readiness
 
-**Assessment date:** 2026-07-13  
-**Decision:** **NO-GO for unrestricted public launch today**
+**Assessment:** 2026-07-13
+**Decision:** **NO-GO for unrestricted production traffic; code-side beta architecture ready for review**
 
-The user experience, visual identity, core CRUD, and deterministic test suites
-are strong. The deployed frontend is nevertheless in mock mode, there is no
-recorded backend production deployment, and live execution/auth/contest
-architecture has material launch blockers.
+## P0 gate register
 
-## P0 launch gates
+| Gate | Current evidence | State |
+|---|---|---:|
+| Private source | All six repos private; anonymous API returns 404 | Closed |
+| Browser/API boundary | Same-origin BFF; no production bearer response/storage | Closed |
+| Session security | Tracked hashes, rotation, reuse detection, revocation checks | Closed |
+| Run/submit contract | `202`, job/submission polling, live contract tests | Closed |
+| Durable execution | Atomic Mongo claim, heartbeat, retry/backoff/dead-letter | Closed |
+| Judge safety | Auth, async poll, timeout/concurrency, CPU/memory/wall/file bounds | Closed in code |
+| Verdict safety | Full terminal enum and safe exhaustion finalization | Closed |
+| Contest correctness | Window/registration/problem attribution and scoring | Closed for beta rules |
+| Runtime/dependencies | Node 24; zero production audit findings; non-root images | Closed |
+| Abuse/input | Redis distributed limits, per-user quota, unsafe-key rejection | Closed in code |
+| Data/content | Migration, indexes, pagination, version-switched testcases | Closed in code |
+| CI/security | PR 22/31 Actions gates, audits, images, Gitleaks, Dependabot | Closed in code; Vercel plan gate open |
+| Branch/release protection | GitHub rejects protection for private org repos on current plan | Owner/platform gate |
+| Production infrastructure | Managed Mongo/Redis/API/worker/private Judge0 | Open |
+| Production configuration | HTTPS URLs, live/no fallback, secrets, Sentry, private Vercel plan | Open |
+| Identity lifecycle | Email verification/recovery and Admin MFA | Open |
+| Observability | Central metrics/traces/errors/alerts and on-call routing | Open |
+| Recovery/capacity | Restore, rollback, resilience and 2× peak load drills | Open |
+| Credentials | Confirm legacy Judge0 values rotated everywhere | Open |
 
-Every row must be closed before real public traffic.
+## Completed P1 engineering
 
-| Gate | Current evidence | Exit criterion |
-|---|---|---|
-| Backend production stack | No deployment recorded | Staging + production API, managed Mongo, private queue/Judge0, rollback tested |
-| Frontend live configuration | Vercel has zero production env vars | `live`, fallback false, production API URL/Sentry/domain verified |
-| Run contract | Frontend `/submissions/run`; backend `/runner/run` | One schema, live contract test green |
-| Async judging | `wait=true`, sequential, no Axios timeout | Durable queue/workers, 202/status, idempotency, retry/DLQ/reconciliation |
-| Resource enforcement | Test limits built then dropped | CPU/memory/wall/output limits reach Judge0 and are tested |
-| Verdict safety | Submission enum incomplete | Every Judge0 status maps/persists without stuck Pending |
-| Session security | Bearer/session in localStorage; refresh not revocable | Memory/BFF access, rotated tracked refresh sessions, revocation/reuse detection |
-| Account lifecycle | No verification/reset/MFA | Email verification, password recovery/change, Admin MFA, deletion/export |
-| Runtime security | CI/Docker Node 20 EOL | Pinned supported Node 24 LTS across CI/deploy |
-| Frontend dependencies | 2 high, 12 moderate, 2 low audit findings | No high/critical; reviewed remediation for remaining findings |
-| Live test evidence | E2E is mock-only; Judge mocked | Full staging journey with real API/Mongo/queue/Judge0 |
-| Source/release protection | GitHub branches unprotected | Required checks/reviews, no force push, protected production promotion |
-| Credentials | Development exposure history exists | All credentials rotated; secret scan and inventory clean |
+- Admin mutation audit stream; cascading user deletion/account export
+- Request correlation and structured logs; Mongo/Redis readiness
+- Editorial server-side unlock enforcement
+- Problem/user/submission pagination and compound indexes
+- Atomic testcase content versioning and idempotent versioned seeds
+- JSON stdin/stdout problem execution contract with public/hidden cases
+- Contest registration race protection and unique leaderboard rows
+- CSP, HSTS, canonical/social metadata, robots and sitemap
 
-## P1 general-availability work
+## Remaining owner/platform work
 
-### Contest correctness
+- Select/provision domains, cloud services, secrets, mail/identity, monitoring,
+  support/status and backup retention.
+- Upgrade the organization plan (or move to an equivalent private host) so
+  protected branches and private-org Vercel deployments are available.
+- Approve legal/privacy/acceptable-use/retention terms, content/dataset rights,
+  trademark clearance, analytics consent and commercial policy.
+- Establish expected beta peak, SLOs/error budgets, cost ceilings and on-call.
+- Run manual accessibility, real Judge0, performance, recovery and incident drills.
 
-- Associate submissions with contest and enforce registration/time windows.
-- Update standings from accepted submissions atomically.
-- Add unique contest/user rows, scoring/penalties/tie-breaks/freeze rules.
-- Prevent registration after end and race duplicates.
+## Verified evidence
 
-### Data integrity and performance
-
-- Add compound indexes and pagination.
-- Add migrations and transaction/compensation boundaries.
-- Resolve orphan behavior for problem, contest, and user deletion.
-- Optimize progress/profile aggregation rather than loading all records.
-- Define submission/source/log retention and account erasure.
-
-### API and content correctness
-
-- Validate every route body/query/ID with a consistent schema system.
-- Make problem/testcase authoring atomic.
-- Enforce editorial unlock rules.
-- Reject malformed auth responses instead of inventing access tokens.
-- Standardize error codes/request IDs and safe response bodies.
-
-### Scale, abuse, and operations
-
-- Configure trusted proxy and distributed Redis rate limits.
-- Add per-user/IP execution quotas, bot protection, cost ceilings.
-- Load-test API/Mongo/queue/Judge0 at launch concurrency.
-- Add structured logs, metrics, traces, alerts, readiness, and runbooks.
-- Demonstrate backup restoration and rollback.
-
-### Quality
-
-- Frontend coverage report/thresholds and live contract tests.
-- Raise backend branch coverage above 67.27%; test runner/Judge directly.
-- Add security, performance, accessibility, visual, concurrency, migration,
-  container, and resilience gates.
-
-## P2 market readiness
-
-- Custom domain, DNS/TLS, CSP and other browser security headers
-- Canonical metadata, Open Graph, robots, sitemap, structured data
-- Terms, privacy, cookie/analytics disclosure, acceptable-use/execution policy
-- Trademark clearance/registration and protected handles/domains
-- Launch-quality catalog/editorials/hidden tests and dataset rights
-- Support/contact/status page, onboarding and transactional email
-- Moderation, abuse appeals, admin audit history
-- Pricing/billing/tax/refund systems if monetized
-- Consent-aware analytics and product/cost dashboards
-- Manual WCAG 2.2 AA and Core Web Vitals budgets
-
-## Evidence baseline
-
-- Frontend: lint/typecheck/build green, 21 unit tests, 8 Playwright tests
-- Backend: 91 tests; 84.3% statement / 67.27% branch coverage
-- Backend production dependency audit: zero known vulnerabilities
-- Frontend production dependency audit: 16 findings, including two high
-- Vercel production: Ready but mock-configured
-- Frontend `develop`: `ccd6503`; `main`: `71cf79b`
-- Backend `main`: `d144514`
+- Frontend: lint/typecheck/build, 26 unit/component tests, 8 Playwright journeys
+- Backend: 20 suites / 115 tests; 83.13% statements, 68.32% branches,
+  80.71% functions and 85.29% lines with enforced thresholds
+- Frontend/backend production dependency audits: zero known findings
+- Both Node 24 images build and run as non-root
+- Isolated production-mode container smoke returned ready Mongo/Redis, enforced
+  cross-origin denial, issued only HttpOnly cookies, and finalized a durable job
+- Gitleaks: frontend clean; backend clean after two exact documented legacy
+  fingerprints, with no broad rule/path exclusions
+- Documentation strict build green
+- Backend PR 22 and frontend PR 31 contain the reviewed hardening branches;
+  GitHub Actions code gates are green. Vercel's private-org Hobby-plan status is
+  an explicit platform failure, not an application test failure.
 
 ## Go/no-go rule
 
-Launch only when every P0 gate has an owner, evidence link, and signed closure;
-relevant P1 systems have passed staging; no high/critical dependency issue is
-accepted without explicit risk approval; restore/rollback work; and the full
-production-like journey succeeds without mock fallback.
+Do not promote production until every open P0 row has an owner and evidence;
+application CI and protected release rules are green; real private Judge0 and
+production-like staging pass; backup/rollback and alerts are demonstrated; no
+high/critical finding is accepted silently; and a signed go/no-go review is
+recorded.

@@ -1,93 +1,59 @@
 # Authentication
 
-## Token model
+## Credential model
 
-| Credential | Transport | Lifetime | Purpose |
+| Credential | Transport | Lifetime | Server state |
 |---|---|---:|---|
-| Access JWT | Bearer header | 15 minutes | API authorization |
-| Refresh JWT | `mlboost_session` httpOnly cookie | 7 days | Session validation and access renewal |
+| Access JWT | `mlboost_access` Secure/HttpOnly cookie | 15 minutes | References Session `sid` |
+| Refresh JWT | `mlboost_session` Secure/HttpOnly cookie | 7 days | SHA-256 hash, expiry, device metadata, revocation/replacement |
 
-Access JWT claims include user ID, username, and roles. Refresh JWT claims
-include user ID.
+Production browser authentication is cookie-only. Bearer authorization is
+disabled by default in production and remains available only for local/test
+diagnostics. Production signup/login/refresh responses do not expose access
+tokens to JavaScript.
 
-## Signup
+## Signup and login
 
 ```http
 POST /api/auth/signup
 Content-Type: application/json
 
-{
-  "name": "Ada Learner",
-  "email": "ada@example.com",
-  "password": "strong-password"
-}
+{"name":"Ada Learner","email":"ada@example.com","password":"strong-password"}
 ```
 
-`username` may be supplied instead of `name`. `role` can only be `User` or
-`Organization`; Admin cannot be self-assigned.
+`username` may replace `name`; self-service roles are `User` and
+`Organization`. Login accepts an email or username in its `email` field. Both
+flows create a tracked Session, set both cookies, and return public user data.
 
-Response `201` includes public user data and `accessToken`; the refresh cookie is
-set by the response.
+## Session and refresh
 
-## Login
+`GET /api/auth/session` validates refresh signature, token hash, expiry,
+revocation and user existence. It uses `Cache-Control: no-store`.
 
-```http
-POST /api/auth/login
-Content-Type: application/json
+`POST /api/auth/refresh` atomically revokes the current Session, creates its
+replacement, rotates both cookies, and returns public user data. Reuse of a
+revoked or mismatched refresh token revokes every active Session for that user.
 
-{
-  "email": "ada@example.com",
-  "password": "strong-password"
-}
-```
+Every authenticated API call validates both the access JWT and referenced live
+Session, so logout/password-change revocation takes effect before JWT expiry.
 
-The `email` field accepts email or username. Response `200` includes user and
-access token and sets the refresh cookie.
+## Account lifecycle
 
-## Session validation
+| Method | Path | Purpose |
+|---|---|---|
+| `POST` | `/auth/logout` | Revoke current Session and clear cookies |
+| `POST` | `/auth/logout-all` | Revoke every Session for current user |
+| `PUT` | `/auth/password` | Verify old password, change hash, revoke other Sessions |
+| `GET` | `/auth/account` | Download account/submission/contest export |
+| `DELETE` | `/auth/account` | Password-confirmed cascading deletion |
 
-```http
-GET /api/auth/session
-Cookie: mlboost_session=<refresh-jwt>
-```
+The same-origin Next.js BFF means backend and public site do not need a shared
+cookie parent domain. `COOKIE_DOMAIN` should normally remain blank; production
+traffic must use HTTPS and `SameSite=Strict` unless a reviewed topology requires
+otherwise.
 
-Returns `authenticated` and the public user. Responses use `Cache-Control:
-no-store`.
+## Remaining identity gates
 
-## Refresh
-
-```http
-POST /api/auth/refresh
-Cookie: mlboost_session=<refresh-jwt>
-```
-
-Returns a new access token. Current refresh tokens are not rotated or revoked;
-this is a P0 production gap.
-
-## Logout
-
-```http
-POST /api/auth/logout
-```
-
-Clears session cookie variants and returns `204`. It does not invalidate a
-copied refresh JWT server-side.
-
-## Cookie topology
-
-Production options depend on the final domain layout:
-
-- Same parent domain (`app.example.com`, `api.example.com`): use an explicit
-  shared cookie domain and normally `SameSite=Strict` or `Lax` after testing.
-- Cross-site frontend/API: `SameSite=None; Secure` plus CSRF protection.
-
-All production traffic must use HTTPS.
-
-## Target production session model
-
-1. Store refresh sessions server-side by hashed random identifier.
-2. Rotate on every refresh.
-3. Detect reuse and revoke the session family.
-4. Keep access tokens in memory or use a backend-for-frontend cookie session.
-5. Support device listing, individual/all-session revocation, admin MFA, email
-   verification, password recovery, and password change.
+Email verification/recovery delivery and mandatory Admin MFA require production
+mail/identity decisions and owner enrollment. They remain launch gates rather
+than being silently simulated.

@@ -3,68 +3,55 @@
 ## Frontend
 
 ```bash
-cd frontend
+npm ci
 npm run lint
 npm run typecheck
 npm run test:unit
 npm run build
-CI=1 npm run test:e2e
+npm run test:e2e
+npm run audit:production
+docker build -t mlboost-frontend .
 ```
 
-Current verified baseline:
+Verified source baseline: eight Vitest files with live BFF/session/run/submit
+contract coverage, 26 unit/component tests, eight Playwright browser journeys,
+strict TypeScript/lint, production build, zero production dependency findings,
+and a non-root Node 24 container.
 
-- 6 Vitest files / 21 tests
-- 8 Playwright tests
-- Production build green
-
-Playwright forces mock mode. This is intentional for deterministic UI coverage,
-but it does not validate the frontend/backend contract.
+Playwright deliberately uses mock product data for deterministic visual/product
+flows. A separate isolated container smoke exercised the real same-origin BFF,
+HttpOnly session, Mongo, Redis, API, durable worker queue and simulated Judge0
+terminal contract.
 
 ## Backend
 
 ```bash
-cd backend-api
-npm test
+npm ci
 npm test -- --coverage
+npm audit --omit=dev --audit-level=high
+docker build -t mlboost-backend .
 ```
 
-Current verified baseline:
+Verified baseline: 20 suites / 115 tests; 83.13% statements, 68.32% branches,
+80.71% functions and 85.29% lines. CI enforces minimum global coverage of 80%
+statements, 65% branches, 80% functions and 80% lines. Tests cover session rotation/reuse/revocation, roles and
+ownership, input guards, idempotency, job claim/retry/dead-letter, Judge0
+polling/resources, contest scoring, content versioning, migrations/seeds,
+account lifecycle, audit history, and Redis lifecycle.
 
-- 13 suites / 91 tests
-- 84.3% statements
-- 67.27% branches
-- 78.5% functions
-- 84.47% lines
+## Security and documentation
 
-Runner and Judge0 integration coverage is low and Judge0 is mocked.
+Both code repositories scan complete Git history with pinned Gitleaks v8.30.1,
+run production dependency audits, build images, and receive grouped Dependabot
+updates. Documentation runs `mkdocs build --strict`.
 
-## Documentation
+## Remaining launch evidence
 
-```bash
-cd documentation
-mkdocs build --strict
-```
-
-## Required launch test matrix
-
-| Layer | Required evidence |
+| Layer | Required external/staging evidence |
 |---|---|
-| Unit | Domain mapping, guards, auth/session, verdict normalization |
-| API integration | Every endpoint, roles, ownership, invalid input, concurrency |
-| Contract | Frontend client against live backend schemas |
-| Execution | Real Judge0 success, compile/runtime/TLE/memory/internal failures |
-| E2E | Staging signup → run → submit → progress → logout |
-| Security | SAST, dependency, secret, container, auth and abuse testing |
-| Performance | API, Mongo, queue and Judge0 at target concurrency |
-| Accessibility | WCAG 2.2 AA manual + automated review |
-| Resilience | Retry, worker crash, deploy interruption, backup restoration |
-
-## CI gates required
-
-- Zero high/critical production dependency findings
-- Coverage thresholds that cannot regress silently
-- OpenAPI/schema compatibility
-- Migration dry run
-- Container build and scan
-- Staging smoke test after deploy
-- Manual production promotion approval
+| Execution | Real private Judge0 compile/runtime/TLE/memory verdicts |
+| Performance | API/Mongo/Redis/jobs/Judge0 at 2× approved beta peak |
+| Resilience | Worker kill/reclaim, Judge outage, deploy interruption |
+| Recovery | Managed Mongo restore and application rollback drill |
+| Observability | Alert delivery and incident correlation |
+| Accessibility | Manual WCAG 2.2 AA plus production Core Web Vitals |

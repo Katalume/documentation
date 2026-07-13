@@ -1,60 +1,55 @@
 # Configuration reference
 
-## Frontend
+## Frontend and BFF
 
-| Variable | Required in production | Purpose |
+| Variable | Production | Purpose |
 |---|---:|---|
-| `NEXT_PUBLIC_API_MODE` | Yes | `live` in production; `mock`/`auto` only for development |
-| `NEXT_PUBLIC_API_URL` | Yes | Backend base URL ending in `/api` |
-| `NEXT_PUBLIC_API_FALLBACK_TO_MOCK` | Yes | Must be `false` in staging/production |
-| `NEXT_PUBLIC_API_RETRY_COUNT` | Recommended | GET/HEAD retry count; default 2 |
-| `NEXT_PUBLIC_API_TIMEOUT_MS` | Recommended | Browser request timeout; default 8000 |
-| `NEXT_PUBLIC_APP_ENV` | Yes | Environment tag such as production/staging |
-| `NEXT_PUBLIC_ANALYTICS_ENDPOINT` | Optional | Approved analytics collector |
-| `NEXT_PUBLIC_SENTRY_DSN` | Recommended | Browser Sentry DSN |
-| `NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE` | Recommended | Browser trace sampling |
-| `SENTRY_DSN` | Recommended | Server/edge Sentry DSN |
-| `SENTRY_TRACES_SAMPLE_RATE` | Recommended | Server trace sampling |
-| `SENTRY_ORG` | Build only | Source-map release organization |
-| `SENTRY_PROJECT` | Build only | Source-map project |
-| `SENTRY_AUTH_TOKEN` | Build secret | Release/source-map upload token |
+| `NEXT_PUBLIC_API_MODE` | Required: `live` | Select live adapter |
+| `NEXT_PUBLIC_API_FALLBACK_TO_MOCK` | Required: `false` | Fail closed on outages |
+| `BACKEND_API_URL` | Required, HTTPS | Server-only private API base ending `/api` |
+| `NEXT_PUBLIC_API_URL` | Leave blank | Direct-browser diagnostic override only |
+| `NEXT_PUBLIC_SITE_URL` | Required, HTTPS | Canonical public origin |
+| `NEXT_PUBLIC_API_RETRY_COUNT` | Recommended | Idempotent retry count, default 2 |
+| `NEXT_PUBLIC_API_TIMEOUT_MS` | Recommended | Per-request timeout, default 8000 ms |
+| `NEXT_PUBLIC_APP_ENV` | Required | Environment telemetry label |
+| `NEXT_PUBLIC_ANALYTICS_ENDPOINT` | Optional | Approved consent-aware collector |
+| `NEXT_PUBLIC_SENTRY_DSN` / `SENTRY_DSN` | Recommended | Client/server error capture |
+| `SENTRY_ORG/PROJECT/AUTH_TOKEN` | Build secret/config | Release/source maps |
 
-All `NEXT_PUBLIC_*` values are visible to browsers and must never contain
-secrets.
+Only `NEXT_PUBLIC_*` values reach browser bundles. Never place secrets there.
+Vercel production compilation refuses mock mode/fallback, missing backend/site
+URLs, or non-HTTPS URLs.
 
-## Backend API
+## Backend API and worker
 
-| Variable | Required in production | Purpose |
+| Variable | Production | Purpose |
 |---|---:|---|
-| `NODE_ENV` | Yes | Must be `production` |
-| `BACKEND_PORT` | Platform-dependent | API listen port; default 5001 |
-| `MONGO_URI` | Yes | Authenticated TLS Mongo connection |
-| `JWT_ACCESS_SECRET` | Yes | Access-token signing secret |
-| `JWT_REFRESH_SECRET` | Yes | Refresh-token signing secret |
-| `COOKIE_DOMAIN` | Topology-dependent | Shared parent domain for cookie |
-| `COOKIE_SAME_SITE` | Yes | `strict`, `lax`, or carefully reviewed `none` |
-| `CORS_ORIGIN` | Yes | Comma-separated exact frontend origins |
-| `JUDGE0_URL` | Yes | Private Judge0 URL |
-| `JUDGE0_AUTH_TOKEN` | Yes | Judge0 `X-Auth-Token` value |
-| `ALLOWED_LANGUAGE_IDS` | Yes | Comma-separated Judge0 language IDs |
-| `MAX_CODE_SIZE` | Recommended | Maximum source bytes; default 65536 |
-| `REDIS_HOST` | Queue target | Queue/limiter host |
-| `REDIS_PORT` | Queue target | Queue/limiter port |
+| `NODE_ENV` | `production` | Fail-fast security behavior |
+| `BACKEND_PORT` | Platform | API port, default 5001 |
+| `TRUST_PROXY` | Required | Trusted proxy hop count |
+| `MONGO_URI` / `MONGO_POOL_SIZE` | Required | TLS database and pool |
+| `REDIS_URL` | Required | Distributed rate-limit store |
+| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | Required | Independent high-entropy signing secrets |
+| `COOKIE_DOMAIN` | Normally blank | BFF issues host-only public-site cookies |
+| `COOKIE_SAME_SITE` | `strict` | Cookie CSRF boundary |
+| `ALLOW_BEARER_AUTH` | `false` | Disable browser bearer path |
+| `CORS_ORIGIN` | Required | Exact administrative/direct origins |
+| `JUDGE0_URL` / `JUDGE0_AUTH_TOKEN` | Required | Private authenticated executor |
+| `JUDGE0_TIMEOUT_MS` | Recommended | Request/poll deadline, default 20000 |
+| `JUDGE0_POLL_INTERVAL_MS` | Recommended | Poll interval, default 250 |
+| `JUDGE0_CONCURRENCY` | Required capacity choice | Testcase concurrency, default 4 |
+| `ALLOWED_LANGUAGE_IDS` | Required | Execution allow list |
+| `MAX_CODE_SIZE` | Recommended | Source bytes, default 65536 |
+| `EVALUATION_WORKER_POLL_MS` | Recommended | Empty-queue poll delay |
+| `EVALUATION_JOB_MAX_ATTEMPTS` | Recommended | Retry/dead-letter bound, default 3 |
+| `EVALUATION_JOB_RETENTION_DAYS` | Policy | Job/source TTL, default 7 |
 
-The production queue will also require TLS/password/URL, namespace, retry,
-concurrency, and dead-letter configuration that is not yet represented.
+Production configuration refuses to start without Mongo, Redis, exact CORS,
+Judge0 authentication, and both JWT secrets.
 
 ## Judge0
 
-At minimum set:
-
-- `AUTHN_TOKEN` and matching backend `JUDGE0_AUTH_TOKEN`
-- strong `REDIS_PASSWORD` and `POSTGRES_PASSWORD`
-- stable `SECRET_KEY_BASE`
-- bounded `COUNT`, `MAX_QUEUE_SIZE`, CPU, wall, memory, process, output, and
-  extracted-file limits
-- `ENABLE_NETWORK=false` and restricted `ALLOW_ENABLE_NETWORK`
-- private `ALLOW_IP`/network policy
-- unused compiler options, arguments, callbacks, and additional files disabled
-
-Never commit environment-specific secret values.
+Set strong `AUTHN_TOKEN`, Redis/Postgres credentials and secret key; bound queue,
+CPU, wall, memory, process, output and extracted-file limits; deny network;
+restrict IP/network access; disable unused callbacks, compiler arguments and
+additional files. Never commit environment values.

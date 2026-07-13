@@ -7,7 +7,8 @@
 ```dotenv
 NEXT_PUBLIC_API_MODE=live
 NEXT_PUBLIC_API_FALLBACK_TO_MOCK=false
-NEXT_PUBLIC_API_URL=https://api.<domain>/api
+BACKEND_API_URL=https://api.<private-domain>/api
+NEXT_PUBLIC_SITE_URL=https://<public-domain>
 NEXT_PUBLIC_APP_ENV=production
 NEXT_PUBLIC_API_RETRY_COUNT=2
 NEXT_PUBLIC_API_TIMEOUT_MS=8000
@@ -35,17 +36,16 @@ CI=1 npm run test:e2e
 
 ### Container baseline
 
-- Upgrade `node:20-alpine` to a pinned Node 24 LTS image/digest.
-- Build and scan the image in CI.
-- Run as non-root (already configured).
-- Add liveness/readiness health checks.
-- Set CPU/memory/connection limits.
-- Send SIGTERM and allow bounded graceful shutdown.
+Both repositories build Node 24 Alpine images and run as non-root. CI rebuilds
+them from clean Linux lockfiles. The API exposes `/health` and Mongo/Redis
+`/ready`, handles bounded SIGTERM shutdown, and must receive platform
+CPU/memory/replica limits. Pin deployment digests after registry publication.
 
 ### Required services
 
 - Managed MongoDB with TLS/backups/PITR
-- Shared Redis for queue and distributed limits
+- Shared Redis for distributed limits
+- Managed MongoDB durable EvaluationJob collection
 - Stateless API replicas behind TLS load balancer
 - Separate worker replicas
 - Private Judge0 CE 1.13.1 deployment with its PostgreSQL and Redis
@@ -55,17 +55,17 @@ CI=1 npm run test:e2e
 - Mongo URI
 - Strong independent JWT access/refresh secrets or key material
 - Judge0 authentication token
-- Queue Redis credentials/TLS settings
-- Cookie domain/same-site policy
+- Redis credentials/TLS settings
+- Cookie same-site policy (normally host-only through the BFF)
 - Exact CORS origins
 - Observability DSNs/tokens
 
 ### Deployment sequence
 
 1. Validate environment and secret presence without printing values.
-2. Apply backward-compatible migrations/index changes.
+2. Run `npm run migrate`, then idempotent `npm run seed` when approved content is required.
 3. Deploy API instances.
-4. Deploy workers paused, validate connectivity, then resume consumption.
+4. Deploy `npm run worker` replicas paused, validate connectivity, then resume.
 5. Run readiness and contract smoke tests.
 6. Shift traffic gradually.
 7. Observe latency, error, queue, judge, database, and cost signals.

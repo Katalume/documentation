@@ -3,7 +3,7 @@
 ## Base URL
 
 ```text
-https://<api-host>/api
+https://<public-site>/api
 ```
 
 Local default:
@@ -18,9 +18,9 @@ Health is outside the API prefix at `GET /health`.
 
 - HTTPS JSON API in production
 - Request bodies limited to 100 KB
-- Authenticated routes use `Authorization: Bearer <access-token>`
-- Refresh/session uses the signed httpOnly `mlboost_session` cookie
-- Browser calls use `credentials: include`
+- Browser calls use same-origin BFF routing with `credentials: include`
+- Access/refresh use signed Secure/HttpOnly cookies
+- The backend origin remains server-only/private
 
 ## Response conventions
 
@@ -29,12 +29,12 @@ Successful endpoints return JSON except `POST /auth/logout`, which returns
 
 ```json
 {
-  "message": "Human-readable error"
+  "message": "Human-readable error",
+  "requestId": "correlation-id"
 }
 ```
 
-The backend should standardize this into a versioned error schema with error
-codes, request IDs, and safe details before public launch.
+Every JSON error and response header carries the same request ID.
 
 ## Limits
 
@@ -42,14 +42,14 @@ codes, request IDs, and safe details before public launch.
 |---|---:|
 | General API | 300 requests / 15 minutes / IP |
 | Authentication | 20 requests / 15 minutes / IP |
-| Execution | 15 requests / minute / IP |
+| Execution | 15 requests / minute / authenticated user |
 | JSON body | 100 KB |
 | Source code | 65,536 bytes by default |
-| Submission history | maximum 100 records |
+| Evaluation testcases | maximum 100 per job |
+| Submission history | maximum 100 records per page |
 | Leaderboard | maximum 100 records |
 
-Production must configure trusted proxy behavior and use a shared rate-limit
-store across API instances.
+Production requires trusted-proxy configuration and shared Redis rate limits.
 
 ## Public, authenticated, and admin routes
 

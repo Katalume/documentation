@@ -4,11 +4,11 @@
 : A submission whose Judge0 status indicates every evaluated hidden test passed.
 
 **Access token**
-: Short-lived bearer JWT used to authorize API calls.
+: Short-lived JWT carried in a Secure/HttpOnly cookie and tied to a live Session.
 
 **Async judging**
-: Target architecture where the API enqueues execution and returns before Judge0
-  completes, while workers durably finalize results.
+: Implemented architecture where the API enqueues execution and returns before
+  Judge0 completes, while workers durably finalize results.
 
 **Blue Eclipse**
 : MLBoost's indigo/lavender product palette.
@@ -36,8 +36,8 @@ It must be disabled outside development.
 completion respectively.
 
 **Refresh session**
-: Long-lived httpOnly cookie credential used to validate the session and issue
-new access tokens.
+: Rotating long-lived HttpOnly cookie whose hash/revocation/replacement is
+tracked in MongoDB.
 
 **Run**
 : Execute code with custom input without saving a submission.

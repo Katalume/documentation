@@ -15,25 +15,23 @@
 
 - Helmet on API
 - Exact configured CORS origins
-- httpOnly secure refresh/session cookie support
-- Short-lived bearer token
+- Same-origin BFF and Secure/HttpOnly/SameSite access/refresh cookies
+- Rotated/hashed/tracked Sessions with revocation and reuse detection
 - Role and ownership enforcement
-- Request body, source size, language, and rate limits
+- Request/body/source/testcase/language limits and distributed/user quotas
 - Judge0 auth header support
-- Non-root API container
-- Secret placeholders and production fail-fast JWT config
+- Non-root Node 24 frontend/backend containers
+- Production fail-fast service/secrets configuration
+- Durable jobs, bounded resources/retries/dead-letter, request IDs/audit logs
 
 ## P0 hardening
 
-- Rotate and server-track refresh sessions; revoke on logout/reuse.
-- Remove persistent bearer tokens from localStorage.
-- Add email verification, reset/change, Admin MFA, and device sessions.
-- Repair live contract and isolate Judge0 on private dedicated hosts.
+- Add email verification/recovery and mandatory Admin MFA.
+- Deploy Judge0 on private dedicated hosts.
 - Configure Judge0 auth, deny network, bound resources/queues, disable unused APIs.
-- Upgrade Node 20 to supported Node 24 LTS.
-- Remediate frontend dependency advisories; block high/critical findings.
+- Retain Node 24 and zero-finding production audit gates.
 - Rotate all credentials ever exposed during development.
-- Protect GitHub branches and production deployments.
+- Protect private repository branches and production deployments.
 
 ## Web controls
 
@@ -49,7 +47,7 @@
 
 - Dependabot/Renovate and dependency review
 - `npm audit` gate and license review
-- CodeQL/SAST and secret scanning/push protection
+- Full-history Gitleaks scanning and private-plan-compatible SAST review
 - SBOM per release
 - Container image scanning and signed provenance
 - Pin Actions and base images to reviewed versions/digests

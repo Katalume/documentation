@@ -1,8 +1,7 @@
 # MLBoost documentation
 
-The authoritative product and engineering documentation for
-[MLBoost](https://github.com/MLBoost2025), an interactive machine-learning and
-data-science practice platform.
+The authoritative product and engineering documentation for MLBoost, an
+interactive machine-learning and data-science practice platform.
 
 This repository documents the current product, the frontend and backend
 architecture, every API, environment configuration, development workflow,
@@ -22,8 +21,8 @@ Open `http://127.0.0.1:8000`.
 
 ## Source of truth
 
-- Product behavior: [`frontend`](https://github.com/MLBoost2025/frontend)
-- API behavior: [`backend-api`](https://github.com/MLBoost2025/backend-api)
+- Product behavior: private `frontend` repository
+- API behavior: private `backend-api` repository
 - Product and operational documentation: this repository
 - Launch gates: [`docs/launch/readiness.md`](docs/launch/readiness.md)
 - Deadline plan: [`docs/launch/july-20-plan.md`](docs/launch/july-20-plan.md)

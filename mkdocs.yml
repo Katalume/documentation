@@ -1,9 +1,5 @@
 site_name: MLBoost Documentation
 site_description: Product, engineering, API, deployment, and operations documentation for MLBoost
-site_url: https://mlboost2025.github.io/documentation/
-repo_url: https://github.com/MLBoost2025/documentation
-repo_name: MLBoost2025/documentation
-edit_uri: edit/main/docs/
 
 theme:
   name: material
@@ -33,7 +29,6 @@ theme:
     - navigation.top
     - navigation.footer
     - content.code.copy
-    - content.action.edit
     - search.suggest
     - search.highlight
 
@@ -60,6 +55,9 @@ markdown_extensions:
 
 extra_css:
   - stylesheets/extra.css
+
+extra:
+  generator: false
 
 nav:
   - Home: index.md

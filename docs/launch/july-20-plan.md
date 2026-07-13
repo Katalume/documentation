@@ -23,13 +23,17 @@ For the July 20 beta:
 
 - Name accountable owner for frontend, API, execution, data, security, and launch.
 - Freeze UI except P0 correctness/accessibility regressions.
-- Protect GitHub branches and required checks.
+- Protect private repository branches and required checks.
 - Move CI/Docker to Node 24 LTS.
 - Patch frontend high dependency findings.
 - Finalize domains, hosting, managed Mongo, Redis, Judge0 host, Sentry, email.
 - Rotate all credentials and inventory secrets.
 
 **Exit:** owners and environments exist; no ambiguity about beta scope.
+
+The Node 24, dependency and CI work is complete in PRs 22/31. Branch protection
+and private-org Vercel deployment require a paid/private-capable plan and remain
+owner/platform gates; do not resolve either by making repositories public.
 
 ### July 14 — staging foundation
 
@@ -54,8 +58,8 @@ failures all produce correct durable user-visible results.
 
 ### July 16 — authentication and data safety
 
-- Move bearer token out of persistent localStorage or ship BFF design.
-- Implement rotated/revocable refresh sessions and logout invalidation.
+- Verify the implemented same-origin BFF/cookie session design in staging.
+- Verify implemented rotation/revocation/logout invalidation in staging.
 - Implement email verification and password recovery/change.
 - Add Admin MFA/short privileged sessions.
 - Add critical indexes, migrations, retention decisions, and safe cascades.

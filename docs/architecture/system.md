@@ -1,81 +1,65 @@
 # System architecture
 
-## Current implementation
+## Implemented architecture
 
 ```mermaid
 flowchart TB
-    B["Browser"] -->|"Next.js pages and client fetch"| F["Frontend / Vercel"]
-    F -->|"HTTPS JSON + cookies"| API["Express API"]
-    API --> DB[("MongoDB")]
-    API -->|"wait=true, sequential"| J["Judge0 API"]
+    B["Browser"] -->|"same-origin /api + HttpOnly cookies"| F["Next.js / Vercel"]
+    F -->|"server-only BACKEND_API_URL"| API["Private Express API"]
+    API --> DB[("Managed MongoDB")]
+    API --> RL[("Managed Redis rate limits")]
+    API --> Q["Durable EvaluationJob collection"]
+    Q --> W1["Evaluation worker"]
+    Q --> W2["Evaluation worker"]
+    W1 --> J["Private Judge0"]
+    W2 --> J
     J --> JR[("Judge0 Redis")]
     J --> JP[("Judge0 PostgreSQL")]
-    J --> JW["Privileged judge workers"]
 ```
 
-The frontend can operate in `mock`, `live`, or `auto` mode. Production must use
-`live` with mock fallback disabled.
-
-## Target production architecture
-
-```mermaid
-flowchart TB
-    U["Users"] --> CDN["CDN / WAF / Vercel"]
-    CDN --> FE["Next.js frontend"]
-    FE --> LB["API load balancer"]
-    LB --> API1["Stateless API instance"]
-    LB --> API2["Stateless API instance"]
-    API1 --> MDB[("Managed MongoDB")]
-    API2 --> MDB
-    API1 --> R[("Managed Redis")]
-    API2 --> R
-    R --> W1["Judge worker"]
-    R --> W2["Judge worker"]
-    W1 --> J0["Private Judge0 cluster"]
-    W2 --> J0
-    API1 -.-> OBS["Logs / metrics / traces / alerts"]
-    API2 -.-> OBS
-    W1 -.-> OBS
-    W2 -.-> OBS
-```
+The frontend retains deterministic `mock` mode for local UI tests. Production
+is fail-closed: `live` mode, no mock fallback, HTTPS site/backend URLs, and a
+server-only backend origin are required by the Vercel production build.
 
 ## Trust boundaries
 
-1. **Public edge:** browsers and untrusted network traffic.
-2. **Application:** Vercel and public API; validates identity and input.
-3. **Data:** MongoDB and session/queue Redis; private network only.
-4. **Execution:** Judge0 and privileged workers; highest-risk boundary because
-   they execute adversarial user code.
-5. **Operations:** CI/CD, secrets, logs, metrics, and administrative access.
+1. **Public edge:** browser, CDN/WAF, and Next.js application.
+2. **BFF boundary:** the generic `/api` route enforces same-origin mutations,
+   forwards only allow-listed headers, and keeps the backend origin private.
+3. **Application:** Express validates identity, session state, input, ownership,
+   roles, quotas, and idempotency.
+4. **Data:** MongoDB and distributed-rate-limit Redis are private.
+5. **Execution:** separate workers and authenticated Judge0 execute adversarial
+   code with CPU, memory, wall-time, file-size, language, and payload limits.
+6. **Operations:** private repositories, CI/CD, secrets, audit events, logs,
+   metrics, alerts, backups, and administrative access.
 
-Judge0 must be isolated from application/data hosts, unauthenticated public
-access must be impossible, and worker egress should be denied unless explicitly
-required.
+## Authentication flow
 
-## Request flows
+1. Browser posts credentials to same-origin `/api/auth/login` or `/signup`.
+2. Next.js forwards server-to-server to Express.
+3. Express creates a hashed, tracked Session and sets short-lived
+   `mlboost_access` plus rotating `mlboost_session` HttpOnly cookies.
+4. Browser-readable access tokens are not returned in production or persisted.
+5. Every API authorization verifies the access JWT and live Session record.
+6. Refresh rotates the session; reuse revokes all active sessions for the user.
 
-### Authentication
+## Evaluation flow
 
-1. Browser posts credentials to API.
-2. API returns a short-lived bearer token and writes a signed httpOnly refresh
-   cookie.
-3. Frontend uses the bearer token for API requests.
-4. Next.js `src/proxy.ts` validates protected navigation with `/auth/session`.
-5. Reload calls `/auth/session`, then `/auth/refresh` for a new bearer token.
+1. API validates source/language, problem/contest eligibility, and an optional
+   `Idempotency-Key`.
+2. It creates a `Queued` Submission plus durable EvaluationJob and returns `202`.
+3. A worker atomically claims the job, heartbeats its lease, and marks the
+   Submission `Processing`.
+4. Judge0 submissions use `wait=false`; the worker polls with bounded timeouts
+   and bounded testcase concurrency while propagating testcase resource limits.
+5. The worker finalizes the verdict and contest score, or retries with backoff
+   before moving exhausted jobs to `dead-letter`.
+6. The frontend polls the owner-scoped submission/job resource.
 
-### Submission — current
+## Remaining deployment topology
 
-1. API validates language and source size.
-2. API writes a Pending Submission.
-3. API loads hidden tests.
-4. API executes each test synchronously through Judge0.
-5. API writes the final verdict and returns the Submission.
-
-### Submission — target
-
-1. API validates, creates an idempotent Pending record, and enqueues a job.
-2. API returns `202` and the submission ID.
-3. Worker claims the job, applies resource policy, executes through Judge0, and
-   atomically finalizes the record.
-4. Frontend polls or receives a status event.
-5. Retries, dead-letter handling, and reconciliation recover interrupted work.
+Production must still provision managed MongoDB and Redis, private Judge0 and
+its stores, API/worker replicas, immutable images, centralized telemetry,
+backups, alerting, and tested rollback. Judge0 must not be publicly reachable or
+share a host/network trust zone with application data.

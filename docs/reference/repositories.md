@@ -7,15 +7,14 @@
 - Next.js/React product
 - Default branch: `develop`
 - Release mirror/production branch: `main`
-- Latest documented `develop`: `ccd6503`
-- Latest documented `main`: `71cf79b`
-- PR #30 merged the Ensemble Spark identity into `develop`
+- Private repository; production-hardening draft PR 31 is under review
 
 Key paths:
 
 - `src/app` — routes and UI
 - `src/app/components` — shared product components
 - `src/lib/api.ts` — live/mock API boundary
+- `src/app/api/[...path]` — same-origin BFF
 - `src/context/AuthContext.tsx` — session state
 - `src/proxy.ts` — route/session validation
 - `e2e` — Playwright flows
@@ -24,7 +23,7 @@ Key paths:
 
 - Express/Mongoose/Judge0 API
 - Default branch: `main`
-- Latest documented main: `d144514`
+- Private repository; production-hardening draft PR 22 is under review
 
 Key paths:
 
@@ -32,9 +31,9 @@ Key paths:
 - `src/controllers` — request/domain orchestration
 - `src/models` — Mongo schemas
 - `src/services/judge.service.js` — Judge0 integration
-- `src/workers` — placeholder async execution files
+- `src/services/evaluation.service.js` — durable queue/job lifecycle
+- `src/workers` — evaluation worker entrypoint
 - `tests` — Jest/Supertest integration tests
-- `judge0` — vendored Judge0 CE configuration
 
 ### `MLBoost2025/documentation`
 
@@ -42,21 +41,24 @@ Key paths:
 - Default branch: `main`
 - Built with MkDocs Material
 
-## Inactive or cleanup candidates
+All six organization repositories are private. `evaluation-engine` and
+`ml-problems` remain reserved/empty; active evaluation/content implementations
+currently live in `backend-api`.
 
-- `backend-api/client` — unused earlier Vite frontend
-- duplicated backend `auth`, `problem`, and `contest` service modules not used by
-  active controllers
-- placeholder Redis/queue/worker files to replace with the real async design
-- empty organization repositories unless ownership/scope is explicitly assigned
+## Reserved repositories
+
+The unused backend Vite client and duplicate problem/contest services were
+removed during hardening. Empty `evaluation-engine` and `ml-problems`
+repositories should remain reserved or be archived once ownership is decided.
 
 ## Branch strategy recommendation
 
-- Backend: protected `main`, short-lived branches, PRs, immutable releases.
+- Backend: protect `main`, use short-lived branches, PRs and immutable releases.
 - Frontend: decide whether `develop` adds value. If retained, document promotion
   `feature → develop → release/main`; otherwise use protected trunk `main`.
-- Documentation: protected `main`; direct push was used only for the initial
-  owner-authorized bootstrap.
+- Documentation: protect `main`; owner-authorized direct pushes were used for
+  bootstrap and this production-readiness synchronization.
 
 No default branch should accept force pushes or bypass required checks for normal
-delivery.
+delivery. GitHub currently rejects private-organization branch protection on the
+active plan; upgrading the plan is a release gate, not a reason to expose source.

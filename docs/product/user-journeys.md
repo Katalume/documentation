@@ -16,15 +16,14 @@ flowchart LR
 
 ### Expected behavior
 
-- Authentication creates a signed httpOnly refresh/session cookie in live mode.
-- Protected navigation is checked by `src/proxy.ts` against the backend session.
+- Authentication creates tracked Secure/HttpOnly access and refresh cookies.
+- Protected navigation is checked server-to-server by `src/proxy.ts`.
 - Problem list state is annotated per user as unsolved, attempted, or solved.
-- Run should execute without saving a submission; submit persists the result.
+- Run queues an ephemeral owner-scoped job; submit queues a durable Submission.
 - Accepted submissions update progress and solved state.
 
-!!! danger "Known live-contract defect"
-    Frontend Run currently targets `/api/submissions/run`, while the backend
-    exposes `/api/runner/run`. This must be repaired before live launch.
+The live client uses `/runner/run`, then polls `/runner/jobs/:id`; submissions
+use an idempotency key and poll `/submissions/:id`.
 
 ## Administrator journey
 
@@ -34,8 +33,8 @@ flowchart LR
 4. Create or manage problems, contests, and learning tracks.
 5. Validate content in staging before publishing to production.
 
-Production administration still needs audit logs, stronger MFA/session controls,
-content lifecycle states, and approval/rollback behavior.
+Admin writes create one-year audit events. Mandatory Admin MFA and formal
+content approval/rollback remain production owner gates.
 
 ## Contest journey
 
@@ -45,6 +44,6 @@ content lifecycle states, and approval/rollback behavior.
 4. Submit solutions during the contest window.
 5. Review standings.
 
-The UI exists, but production contest attribution and scoring are incomplete:
-submissions do not carry a contest ID and the active submission path does not
-populate leaderboard records.
+Contest links carry contest context into submissions. The API enforces active
+window, registration and problem membership; first Accepted solves update one
+unique leaderboard row idempotently.
