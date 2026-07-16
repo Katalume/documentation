@@ -11,8 +11,8 @@
 - Data: MongoDB Atlas free cluster with 126 published problems and 3,486 active,
   deterministic testcases
 - Distributed limits: Upstash Redis free tier over TLS
-- Authentication: email/password and Google OAuth; Google is external and in
-  production. GitHub remains disabled until its client secret is generated.
+- Authentication: email/password plus Google and GitHub OAuth. Both external
+  providers are configured in production through the same-origin BFF.
 - Execution: pinned local CPython/Pyodide worker in the browser. The public API
   intentionally reports `execution: disabled` and rejects server run/submit.
 
@@ -27,8 +27,10 @@ disabled until isolated execution capacity is funded and proven.
 - Backend PR 28 merged with 23 suites / 140 tests and Gitleaks
 - Public `/health` and `/ready` return `200`; readiness reports Mongo and Redis
   healthy
-- Public same-origin BFF returns all 126 problems and exposes only Google from
-  `/api/auth/providers`
+- Public same-origin BFF returns all 126 problems and exposes Google and GitHub
+  from `/api/auth/providers`
+- GitHub OAuth returns the GitHub authorization flow with callback
+  `https://katalume.vercel.app/api/auth/oauth/github/callback`
 - Real Chrome smoke: account lifecycle, 126-problem catalog, local CPython
   compile, 2/2 sample tests, and 8/8 Easy practice tests accepted
 - Disposable launch account and credentials removed after the smoke test

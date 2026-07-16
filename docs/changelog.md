@@ -17,8 +17,10 @@
   access, corrected Upstash TCP TLS credentials, and verified public health,
   readiness, BFF, catalog, and security-header contracts.
 - Updated Google OAuth to the Vercel callback and moved the external app to
-  production. GitHub OAuth remains safely hidden pending sudo-mode secret
-  generation.
+  production.
+- Configured GitHub OAuth in Render, deployed the provider without exposing its
+  credentials, and verified the live GitHub authorization and Vercel callback
+  flow.
 - Completed a real public Chrome smoke (2/2 samples and 8/8 practice tests) and
   deleted the disposable account and credentials afterward.
 

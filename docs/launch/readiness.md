@@ -11,7 +11,7 @@
 | Public API | Render latest `f99bde8` deploy is `live` | Closed |
 | Browser/API boundary | Same-origin BFF; production bearer responses disabled | Closed |
 | Session security | Tracked rotation/revocation and HttpOnly Katalume cookies | Closed |
-| Authentication | Email/password plus external Google OAuth in production | Closed for beta |
+| Authentication | Email/password plus external Google and GitHub OAuth in production | Closed for beta |
 | Catalog | 126 problems: 42 Easy, 42 Medium, 42 Hard | Closed |
 | Test content | 3,486 deterministic cases: 8/25/50 per Easy/Medium/Hard problem | Closed |
 | Practice execution | Local pinned CPython/WASM worker; real public 8/8 acceptance | Closed |
@@ -38,8 +38,6 @@
 
 ## Remaining owner/platform work
 
-- Generate the GitHub OAuth client secret after GitHub sudo-mode authentication,
-  store it in the protected secret file and Render, then verify the provider.
 - Configure protected branches and independent release approvals.
 - Approve privacy, acceptable-use, retention, content-rights, trademark,
   analytics-consent, and commercial terms.
