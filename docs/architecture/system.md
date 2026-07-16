@@ -1,65 +1,71 @@
 # System architecture
 
-## Implemented architecture
+## Public free-beta architecture
 
 ```mermaid
 flowchart TB
-    B["Browser"] -->|"same-origin /api + HttpOnly cookies"| F["Next.js / Vercel"]
-    F -->|"server-only BACKEND_API_URL"| API["Private Express API"]
-    API --> DB[("Managed MongoDB")]
-    API --> RL[("Managed Redis rate limits")]
-    API --> Q["Durable EvaluationJob collection"]
-    Q --> W1["Evaluation worker"]
-    Q --> W2["Evaluation worker"]
-    W1 --> J["Private Judge0"]
-    W2 --> J
+    B["Browser"] -->|"same-origin /api + HttpOnly cookies"| F["Next.js on Vercel"]
+    F -->|"server-only BACKEND_API_URL"| API["Express API on Render"]
+    API --> DB[("MongoDB Atlas")]
+    API --> RL[("Upstash Redis rate limits")]
+    B -->|"local dedicated worker"| PY["Pinned CPython / Pyodide"]
+    PY -->|"deterministic JSON tests; no application network"| R["Practice result + local history"]
+```
+
+Production is fail-closed: live adapter, no mock fallback, HTTPS site/backend
+URLs, and a server-only backend origin. The frontend serves the pinned Python
+runtime and Monaco assets locally; it does not depend on an editor/runtime CDN.
+
+## Trust boundaries
+
+1. **Public edge:** browser, Vercel, and the same-origin BFF.
+2. **BFF:** forwards only allow-listed headers, handles backend redirects
+   manually, and keeps authentication cookies on the public origin.
+3. **Application:** Express validates sessions, input, roles, ownership, quotas,
+   and content access.
+4. **Data:** Atlas requires a database user plus narrow IP access; Upstash uses
+   TLS credentials.
+5. **Practice execution:** a disposable Web Worker runs CPython/WASM with source
+   size and time limits. Network primitives are removed after runtime loading.
+6. **Server execution:** API run/submit routes reject requests while
+   `EXECUTION_MODE=disabled`.
+
+Browser isolation is suitable for a practice beta, not adversarial ranked
+judging. A user controls their browser and can inspect client-delivered tests.
+
+## Authentication flow
+
+1. Browser posts email credentials or starts Google OAuth through same-origin
+   `/api/auth/*`.
+2. Next.js forwards server-to-server and preserves backend redirects and
+   `Set-Cookie` headers.
+3. Express creates a hashed, tracked Session and issues `katalume_access` and
+   rotating `katalume_session` HttpOnly cookies.
+4. Browser-readable access tokens are not returned or persisted in production.
+5. Refresh rotates the session; detected reuse revokes the user's sessions.
+
+## Practice evaluation flow
+
+1. The live API supplies problem content and public examples; the versioned
+   frontend catalog supplies the matching local practice suite.
+2. Run evaluates the two public samples. Submit evaluates all practice cases:
+   8 Easy, 25 Medium, or 50 Hard.
+3. A disposable worker loads pinned CPython, imports the user's `solve(payload)`,
+   executes JSON cases, and applies tolerant numeric comparison.
+4. The UI stores accepted history and progress locally and labels the result
+   source `browser`.
+
+## Future durable evaluation
+
+```mermaid
+flowchart LR
+    API["Express API"] --> Q[("Mongo EvaluationJob")]
+    Q --> W["Isolated worker"]
+    W --> J["Private authenticated Judge0"]
     J --> JR[("Judge0 Redis")]
     J --> JP[("Judge0 PostgreSQL")]
 ```
 
-The frontend retains deterministic `mock` mode for local UI tests. Production
-is fail-closed: `live` mode, no mock fallback, HTTPS site/backend URLs, and a
-server-only backend origin are required by the Vercel production build.
-
-## Trust boundaries
-
-1. **Public edge:** browser, CDN/WAF, and Next.js application.
-2. **BFF boundary:** the generic `/api` route enforces same-origin mutations,
-   forwards only allow-listed headers, and keeps the backend origin private.
-3. **Application:** Express validates identity, session state, input, ownership,
-   roles, quotas, and idempotency.
-4. **Data:** MongoDB and distributed-rate-limit Redis are private.
-5. **Execution:** separate workers and authenticated Judge0 execute adversarial
-   code with CPU, memory, wall-time, file-size, language, and payload limits.
-6. **Operations:** public repositories, CI/CD, secrets, audit events, logs,
-   metrics, alerts, backups, and administrative access.
-
-## Authentication flow
-
-1. Browser posts credentials to same-origin `/api/auth/login` or `/signup`.
-2. Next.js forwards server-to-server to Express.
-3. Express creates a hashed, tracked Session and sets short-lived
-   `katalume_access` plus rotating `katalume_session` HttpOnly cookies.
-4. Browser-readable access tokens are not returned in production or persisted.
-5. Every API authorization verifies the access JWT and live Session record.
-6. Refresh rotates the session; reuse revokes all active sessions for the user.
-
-## Evaluation flow
-
-1. API validates source/language, problem/contest eligibility, and an optional
-   `Idempotency-Key`.
-2. It creates a `Queued` Submission plus durable EvaluationJob and returns `202`.
-3. A worker atomically claims the job, heartbeats its lease, and marks the
-   Submission `Processing`.
-4. Judge0 submissions use `wait=false`; the worker polls with bounded timeouts
-   and bounded testcase concurrency while propagating testcase resource limits.
-5. The worker finalizes the verdict and contest score, or retries with backoff
-   before moving exhausted jobs to `dead-letter`.
-6. The frontend polls the owner-scoped submission/job resource.
-
-## Remaining deployment topology
-
-Production must still provision managed MongoDB and Redis, private Judge0 and
-its stores, API/worker replicas, immutable images, centralized telemetry,
-backups, alerting, and tested rollback. Judge0 must not be publicly reachable or
-share a host/network trust zone with application data.
+The backend already contains atomic claims, leases, retries, dead letters,
+bounded polling/concurrency, and verdict mapping. This path remains off until
+isolated infrastructure, monitoring, capacity, and recovery are proven.

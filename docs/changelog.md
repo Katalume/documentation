@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-07-16
+
+- Published the zero-cost beta at `katalume.vercel.app` with a live same-origin
+  API on Render, Atlas data, and Upstash distributed rate limits.
+- Added a versioned 126-problem catalog: 42 Easy, 42 Medium, and 42 Hard, backed
+  by 3,486 deterministic testcases (8/25/50 by difficulty).
+- Added pinned local CPython/Pyodide execution in a disposable worker, bundled
+  Monaco/runtime assets, local practice progress/history, and explicit browser
+  result attribution.
+- Kept server execution and ranked contests fail-closed while preserving the
+  isolated Judge0 worker path for a later paid upgrade.
+- Merged backend PR 28 and frontend PRs 40/41 with green tests, E2E, audit,
+  secret scan, and deployment checks.
+- Configured live Vercel production variables, narrow Render-to-Atlas network
+  access, corrected Upstash TCP TLS credentials, and verified public health,
+  readiness, BFF, catalog, and security-header contracts.
+- Updated Google OAuth to the Vercel callback and moved the external app to
+  production. GitHub OAuth remains safely hidden pending sudo-mode secret
+  generation.
+- Completed a real public Chrome smoke (2/2 samples and 8/8 practice tests) and
+  deleted the disposable account and credentials afterward.
+
 ## 2026-07-13
 
 - Implemented durable asynchronous evaluation, tracked rotating Sessions,

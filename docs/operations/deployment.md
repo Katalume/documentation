@@ -1,27 +1,21 @@
 # Deployment
 
-## Frontend
+## Public free-beta profile
 
-### Required Vercel production configuration
+### Frontend: Vercel
 
 ```dotenv
 NEXT_PUBLIC_API_MODE=live
 NEXT_PUBLIC_API_FALLBACK_TO_MOCK=false
-BACKEND_API_URL=https://api.<private-domain>/api
-NEXT_PUBLIC_SITE_URL=https://<public-domain>
+BACKEND_API_URL=https://katalume-api.onrender.com/api
+NEXT_PUBLIC_SITE_URL=https://katalume.vercel.app
+NEXT_PUBLIC_EXECUTION_MODE=browser
 NEXT_PUBLIC_APP_ENV=production
-NEXT_PUBLIC_API_RETRY_COUNT=2
-NEXT_PUBLIC_API_TIMEOUT_MS=8000
-NEXT_PUBLIC_SENTRY_DSN=<dsn>
-SENTRY_DSN=<server-dsn>
-SENTRY_ORG=<org>
-SENTRY_PROJECT=<project>
-SENTRY_AUTH_TOKEN=<secret>
 ```
 
-Add an approved analytics endpoint only after privacy/consent review.
-
-### Release checks
+Deploy `main` to production. `develop` is the integration branch and must have
+the same tree as `main` at release. Apply environment changes by redeploying the
+known-good production artifact; Vercel does not retroactively inject them.
 
 ```bash
 npm ci
@@ -30,58 +24,83 @@ npm run typecheck
 npm run test:unit
 npm run build
 CI=1 npm run test:e2e
+npm audit --omit=dev
 ```
 
-## Backend
+The postinstall step copies the pinned Pyodide runtime to `public/pyodide`.
+Docker dependency stages use `npm ci --ignore-scripts`; the builder must run
+`npm run postinstall` before `npm run build`.
 
-### Container baseline
+### Backend: Render
 
-Both repositories build Node 24 Alpine images and run as non-root. CI rebuilds
-them from clean Linux lockfiles. The API exposes `/health` and Mongo/Redis
-`/ready`, handles bounded SIGTERM shutdown, and must receive platform
-CPU/memory/replica limits. Pin deployment digests after registry publication.
+The free Blueprint deploys Docker service `katalume-api` from backend `main`.
+The public profile uses:
 
-### Required services
+```dotenv
+NODE_ENV=production
+EXECUTION_MODE=disabled
+TRUST_PROXY=1
+ALLOW_BEARER_AUTH=false
+COOKIE_DOMAIN=
+COOKIE_SAME_SITE=lax
+MONGO_POOL_SIZE=5
+```
 
-- Managed MongoDB with TLS/backups/PITR
-- Shared Redis for distributed limits
-- Managed MongoDB durable EvaluationJob collection
-- Stateless API replicas behind TLS load balancer
-- Separate worker replicas
-- Private Judge0 CE 1.13.1 deployment with its PostgreSQL and Redis
+Set Mongo, Redis, JWT, origin, frontend, and OAuth values in Render; never place
+their values in `render.yaml` or shell history. `REDIS_URL` must be Upstash's TCP
+TLS URL (`rediss://...`), not its REST token. Seed content from a trusted local
+environment because Render free does not provide paid pre-deploy jobs.
 
-### Required secrets
+```bash
+npm ci
+npm test
+npm run migrate
+npm run seed
+```
 
-- Mongo URI
-- Strong independent JWT access/refresh secrets or key material
-- Judge0 authentication token
-- Redis credentials/TLS settings
-- Cookie same-site policy (normally host-only through the BFF)
-- Exact CORS origins
-- Observability DSNs/tokens
+The seed is versioned and idempotent. Current expected production totals are
+126 problems and 3,486 active testcases.
 
-### Deployment sequence
+### Network controls
 
-1. Validate environment and secret presence without printing values.
-2. Run `npm run migrate`, then idempotent `npm run seed` when approved content is required.
-3. Deploy API instances.
-4. Deploy `npm run worker` replicas paused, validate connectivity, then resume.
-5. Run readiness and contract smoke tests.
-6. Shift traffic gradually.
-7. Observe latency, error, queue, judge, database, and cost signals.
+Atlas must allow the operator's current IP plus the exact shared outbound CIDRs
+shown by Render. The launch service currently reports `74.220.52.0/24` and
+`74.220.60.0/24`. Never use `0.0.0.0/0`. Reconcile the list whenever the Render
+region or service is recreated.
 
-## Judge0 isolation
+### Post-deploy checks
 
-Judge0 runs privileged containers. Deploy on dedicated, hardened execution hosts;
-never on the API/database host. Keep port `2358` private, set `AUTHN_TOKEN`, deny
-worker network egress, cap queue/workers/resources, rotate Redis/Postgres
-passwords, and disable unused compiler arguments/callback/additional-file
-features.
+```bash
+curl -fsS https://katalume-api.onrender.com/health
+curl -fsS https://katalume-api.onrender.com/ready
+curl -fsS 'https://katalume.vercel.app/api/problems?limit=200'
+curl -fsS https://katalume.vercel.app/api/auth/providers
+```
+
+Expected results: health and ready `200`, Mongo/Redis true, server execution
+disabled, 126 BFF problems, and Google listed. Complete an actual browser Run
+and Submit after every execution-runtime change.
+
+## Free-tier behavior
+
+Render sleeps after inactivity, so the first API-backed action can be delayed by
+roughly a minute. Do not create artificial keep-alive traffic. Surface a clear
+wake-up/retry experience and upgrade when real usage warrants it.
+
+## Future server-execution deployment
+
+When paid capacity is approved, add managed Mongo/Redis, stateless API replicas,
+separate workers, and private authenticated Judge0 with its own Redis/Postgres.
+Set `EXECUTION_MODE=judge0` only after resource limits, denied network egress,
+capacity, alerts, recovery, and rollback are proven. Judge0 must never share an
+API/data trust zone or expose port 2358 publicly.
 
 ## Rollback
 
-- Frontend: promote previous known-good Vercel deployment.
-- API: restore previous immutable image while maintaining schema compatibility.
-- Workers: pause queue, deploy previous worker, resume after health verification.
-- Data: never “roll back” by restoring production data without an incident plan;
-  use reversible migrations or targeted repair.
+- Frontend: promote the previous known-good Vercel production deployment.
+- API: redeploy the previous immutable commit/image while keeping schema
+  compatibility.
+- Configuration: restore the last verified environment revision, then rerun
+  health, readiness, BFF, auth, and catalog checks.
+- Data: use reversible migrations or targeted repair; never restore production
+  data without an incident plan.

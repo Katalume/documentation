@@ -14,6 +14,10 @@ architecture, every API, environment configuration, development workflow,
 production operations, security expectations, and the July 20, 2026 launch
 plan.
 
+Current public beta: [https://katalume.vercel.app](https://katalume.vercel.app)
+with 126 practice problems and pinned in-browser Python execution. Server-side
+ranked execution remains intentionally disabled.
+
 ## Quick start
 
 ```bash

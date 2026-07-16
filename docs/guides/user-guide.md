@@ -18,13 +18,15 @@ is complete.
 3. Open a problem card or table row.
 4. Read the description, constraints, examples, and hints.
 5. Write code in the editor.
-6. Use **Run** for custom input without saving a submission.
-7. Use **Submit** to judge against hidden tests and store the result.
-8. Review runtime, memory, verdict, and submission history.
+6. Use **Run** for the two public sample cases.
+7. Use **Submit** for the complete local practice suite: 8 Easy, 25 Medium, or
+   50 Hard cases.
+8. Review the verdict and device-local history. The result source is labelled
+   `browser` in the free beta.
 
 ## Track progress
 
-- Dashboard: totals, acceptance, recent activity, and difficulty progress
+- Dashboard: local practice totals, acceptance, recent activity, and difficulty progress
 - Progress: weekly activity, current/longest streak, and topic coverage
 - Profile: heatmap, acceptance trend, topic progress, and account settings
 
@@ -35,9 +37,9 @@ skills and tags, then open a filtered problem catalog.
 
 ## Competitions
 
-Competition pages show schedule, description, problem set, registration, and
-standings. Until production contest attribution/scoring is complete, competition
-results must be treated as pre-release functionality.
+Competition pages show schedule, description, problem set, and planned
+standings. Ranked registration is disabled in browser-execution mode and is
+labelled coming soon.
 
 ## Theme and accessibility
 

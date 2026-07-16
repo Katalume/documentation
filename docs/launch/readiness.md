@@ -1,73 +1,56 @@
 # Production readiness
 
-**Assessment:** 2026-07-13
-**Decision:** **NO-GO for unrestricted production traffic; code-side beta architecture ready for review**
+**Assessment:** 2026-07-16
+**Decision:** **GO for a clearly labelled, zero-cost public practice beta; NO-GO for ranked or SLO-backed server execution**
 
-## P0 gate register
+## Launch gate register
 
 | Gate | Current evidence | State |
 |---|---|---:|
-| Repository visibility | All six repos public; product UI contains no repository links | Closed |
-| Browser/API boundary | Same-origin BFF; no production bearer response/storage | Closed |
-| Session security | Tracked hashes, rotation, reuse detection, revocation checks | Closed |
-| Run/submit contract | `202`, job/submission polling, live contract tests | Closed |
-| Durable execution | Atomic Mongo claim, heartbeat, retry/backoff/dead-letter | Closed |
-| Judge safety | Auth, async poll, timeout/concurrency, CPU/memory/wall/file bounds | Closed in code |
-| Verdict safety | Full terminal enum and safe exhaustion finalization | Closed |
-| Contest correctness | Window/registration/problem attribution and scoring | Closed for beta rules |
-| Runtime/dependencies | Node 24; zero production audit findings; non-root images | Closed |
-| Abuse/input | Redis distributed limits, per-user quota, unsafe-key rejection | Closed in code |
-| Data/content | Migration, indexes, pagination, version-switched testcases | Closed in code |
-| CI/security | PRs 22/31/32 merged with green Actions, deployment, audits, images, Gitleaks, Dependabot | Closed in code |
-| Branch/release protection | Required checks, review rules and release approvals need owner configuration | Owner/platform gate |
-| Production infrastructure | Managed Mongo/Redis/API/worker/private Judge0 | Open |
-| Production configuration | HTTPS URLs, live/no fallback, secrets and Sentry | Open |
+| Public frontend | Vercel production alias is `Ready` | Closed |
+| Public API | Render latest `f99bde8` deploy is `live` | Closed |
+| Browser/API boundary | Same-origin BFF; production bearer responses disabled | Closed |
+| Session security | Tracked rotation/revocation and HttpOnly Katalume cookies | Closed |
+| Authentication | Email/password plus external Google OAuth in production | Closed for beta |
+| Catalog | 126 problems: 42 Easy, 42 Medium, 42 Hard | Closed |
+| Test content | 3,486 deterministic cases: 8/25/50 per Easy/Medium/Hard problem | Closed |
+| Practice execution | Local pinned CPython/WASM worker; real public 8/8 acceptance | Closed |
+| Server execution | Fail-closed with `EXECUTION_MODE=disabled` | Closed by restriction |
+| Data/cache | Atlas and Upstash readiness true | Closed for beta |
+| Network access | Only current operator IP and exact Render outbound CIDRs | Closed |
+| CI/security | Frontend #40/#41 and backend #28 green and merged | Closed |
+| Production configuration | Live/no-fallback Vercel env and Render secrets verified | Closed |
+| Branch/release protection | Review bypass remains possible for owner | Owner gate |
 | Identity lifecycle | Email verification/recovery and Admin MFA | Open |
-| Observability | Central metrics/traces/errors/alerts and on-call routing | Open |
-| Recovery/capacity | Restore, rollback, resilience and 2× peak load drills | Open |
-| Credentials | Confirm legacy Judge0 values rotated everywhere | Open |
+| Observability | Central metrics/errors/alerts and on-call routing | Open |
+| Recovery/capacity | Restore, rollback, resilience, and peak-load drills | Open |
+| Ranked contests | Requires durable isolated server judge | Disabled |
 
-## Completed P1 engineering
+## Free-beta operating rules
 
-- Admin mutation audit stream; cascading user deletion/account export
-- Request correlation and structured logs; Mongo/Redis readiness
-- Editorial server-side unlock enforcement
-- Problem/user/submission pagination and compound indexes
-- Atomic testcase content versioning and idempotent versioned seeds
-- JSON stdin/stdout problem execution contract with public/hidden cases
-- Contest registration race protection and unique leaderboard rows
-- CSP, HSTS, canonical/social metadata, robots and sitemap
+1. Market the current release as a public practice beta, not a guaranteed judge.
+2. Keep ranked contest registration and server run/submit disabled.
+3. Never keep Render awake with artificial traffic or weaken Atlas to
+   `0.0.0.0/0`.
+4. Treat local browser history as device-local; do not promise cross-device
+   progress until durable server submissions are enabled.
+5. Monitor Atlas, Upstash, Render, and Vercel quotas weekly.
 
 ## Remaining owner/platform work
 
-- Select/provision domains, cloud services, secrets, mail/identity, monitoring,
-  support/status and backup retention.
-- Configure protected branches, required checks, release approvals, and the
-  production deployment environment.
-- Approve legal/privacy/acceptable-use/retention terms, content/dataset rights,
-  trademark clearance, analytics consent and commercial policy.
-- Establish expected beta peak, SLOs/error budgets, cost ceilings and on-call.
-- Run manual accessibility, real Judge0, performance, recovery and incident drills.
+- Generate the GitHub OAuth client secret after GitHub sudo-mode authentication,
+  store it in the protected secret file and Render, then verify the provider.
+- Configure protected branches and independent release approvals.
+- Approve privacy, acceptable-use, retention, content-rights, trademark,
+  analytics-consent, and commercial terms.
+- Add central error reporting and an owner-tested incident/rollback path.
+- Establish expected beta peak, SLOs/error budgets, and free-tier exhaustion
+  behavior.
 
-## Verified evidence
+## Upgrade gate for server Submit
 
-- Frontend: lint/typecheck/build, 26 unit/component tests, 8 Playwright journeys
-- Backend: 20 suites / 115 tests; 83.13% statements, 68.32% branches,
-  80.71% functions and 85.29% lines with enforced thresholds
-- Frontend/backend production dependency audits: zero known findings
-- Both Node 24 images build and run as non-root
-- Isolated production-mode container smoke returned ready Mongo/Redis, enforced
-  cross-origin denial, issued only HttpOnly cookies, and finalized a durable job
-- Gitleaks: frontend clean; backend clean after two exact documented legacy
-  fingerprints, with no broad rule/path exclusions
-- Documentation strict build green
-- Backend PR 22 and frontend PRs 31/32 are merged; GitHub Actions code gates are
-  green and the frontend preview deployment completed successfully.
-
-## Go/no-go rule
-
-Do not promote production until every open P0 row has an owner and evidence;
-application CI and protected release rules are green; real private Judge0 and
-production-like staging pass; backup/rollback and alerts are demonstrated; no
-high/critical finding is accepted silently; and a signed go/no-go review is
-recorded.
+Do not enable `EXECUTION_MODE=judge0` until private Judge0 and its Redis/Postgres
+stores are isolated from application data; workers, retries, dead letters,
+resource/network limits, alerting, load, restore, and rollback have passed in a
+production-like environment. Browser Run can remain available during and after
+that migration.

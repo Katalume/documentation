@@ -9,11 +9,11 @@ rigor meets Kaggle depth.
 The name combines **kata**, deliberate practice that forges mastery, with
 **lume**, light or illumination—the moment a hard problem clicks.
 
-!!! warning "Launch status — 2026-07-13"
-    The application-side P0 architecture is implemented and container-verified,
-    but Katalume is **not yet ready for unrestricted production traffic** until
-    managed infrastructure, production secrets/configuration, restore/load
-    drills, monitoring, and release approvals are completed. See
+!!! info "Launch status — 2026-07-16"
+    Katalume is live as a **zero-cost public practice beta** at
+    [katalume.vercel.app](https://katalume.vercel.app). Browser practice is live;
+    ranked contests and server execution remain disabled until isolated paid
+    judging, monitoring, capacity, and recovery evidence are complete. See
     [Production readiness](launch/readiness.md).
 
 ## Where to begin
@@ -32,24 +32,22 @@ The name combines **kata**, deliberate practice that forges mastery, with
 ```mermaid
 flowchart LR
     U["Learner or admin"] --> F["Next.js frontend + same-origin BFF"]
-    F --> A["Private Express API"]
-    A --> M[("MongoDB")]
-    A --> Q["Durable Mongo evaluation jobs"]
-    Q --> W["Separate judge worker"]
-    W --> J["Private Judge0 cluster"]
-    F -. telemetry .-> S["Sentry / analytics"]
-    A -. metrics and logs .-> O["Observability stack — required"]
+    F --> A["Express API on Render"]
+    A --> M[("MongoDB Atlas")]
+    A --> R[("Upstash Redis")]
+    U --> P["Pinned CPython / Pyodide worker"]
+    P --> H["Device-local practice history"]
 ```
 
-Solid paths describe the implemented, locally container-verified request flow.
-Production hosting and observability remain deployment gates.
+Solid paths describe the live free-beta flow. Durable evaluation workers and a
+private Judge0 remain the future server-submit path.
 
 ## Current repositories
 
 | Repository | Purpose | Canonical branch/state |
 |---|---|---|
-| `frontend` | Next.js product and same-origin BFF | Public; hardening merged to `develop` and synced to `main` |
-| `backend-api` | Express/Mongo/evaluation worker/Judge0 API | Public; hardening merged to `main` |
+| `frontend` | Next.js product, browser Python, and same-origin BFF | Public; PR 40 merged to `develop`, PR 41 synced to `main` |
+| `backend-api` | Express/Mongo API and future evaluation worker/Judge0 path | Public; catalog PR 28 merged to `main` |
 | `documentation` | This source of truth | `main` |
 
-All six organization repositories are public as of 2026-07-13.
+All six organization repositories are public.

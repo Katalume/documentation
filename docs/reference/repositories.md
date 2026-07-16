@@ -7,13 +7,17 @@
 - Next.js/React product
 - Default branch: `develop`
 - Release mirror/production branch: `main`
-- Public repository; hardening PR 31 is merged to `develop` and sync PR 32 is merged to `main`
+- Public repository; browser-practice PR 40 is merged to `develop` and release
+  PR 41 is merged to `main`
 
 Key paths:
 
 - `src/app` — routes and UI
 - `src/app/components` — shared product components
 - `src/lib/api.ts` — live/mock API boundary
+- `src/lib/browserPython.ts` — disposable browser CPython runner
+- `public/python-runner.worker.mjs` — isolated worker entrypoint
+- `src/data/problem-catalog.json` — versioned local practice suites
 - `src/app/api/[...path]` — same-origin BFF
 - `src/context/AuthContext.tsx` — session state
 - `src/proxy.ts` — route/session validation
@@ -21,9 +25,9 @@ Key paths:
 
 ### `Katalume/backend-api`
 
-- Express/Mongoose/Judge0 API
+- Express/Mongoose API plus disabled-by-default Judge0 upgrade path
 - Default branch: `main`
-- Public repository; hardening PR 22 is merged to `main`
+- Public repository; catalog PR 28 is merged to `main`
 
 Key paths:
 
@@ -33,6 +37,8 @@ Key paths:
 - `src/services/judge.service.js` — Judge0 integration
 - `src/services/evaluation.service.js` — durable queue/job lifecycle
 - `src/workers` — evaluation worker entrypoint
+- `scripts/generateProblemCatalog.js` — deterministic catalog generator
+- `data/problem-catalog.json` — 126 versioned problems and testcases
 - `tests` — Jest/Supertest integration tests
 
 ### `Katalume/documentation`
@@ -61,4 +67,4 @@ repositories should remain reserved or be archived once ownership is decided.
 
 No default branch should accept force pushes or bypass required checks for normal
 delivery. Configure required checks, review requirements, and release approvals
-before opening the public beta.
+before general availability.

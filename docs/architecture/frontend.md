@@ -3,7 +3,8 @@
 ## Stack
 
 - Next.js 16 App Router, React 19, TypeScript and Tailwind CSS v4
-- Monaco editor, `next-themes`, Sentry, Vitest, Testing Library, Playwright
+- Monaco editor, pinned Pyodide/CPython, `next-themes`, Sentry, Vitest,
+  Testing Library, Playwright
 - Node.js 24 standalone non-root production image
 
 ## Integration boundary
@@ -30,10 +31,13 @@ deduplication handled by server-side rotation.
 - CSP, HSTS, frame denial, MIME sniffing, referrer and permissions policies.
 - Canonical/Open Graph/Twitter metadata, robots and sitemap.
 - Production dependency audit contains zero known vulnerabilities.
-- Live contract unit tests cover cookies, runner polling and idempotent submit.
+- Live contract unit tests cover cookies, OAuth redirects, runner polling,
+  local Python execution, and idempotent submit.
 - Eight deterministic browser journeys cover responsive/accessibility/product
   flows without depending on external services.
 
-Mock mode and localStorage are isolated to deterministic demo/test data only.
-The approved Blue Eclipse/Ensemble Spark UI remains product-focused and does not
-surface organization or repository links.
+Mock mode is isolated to deterministic demo/test data. In the free beta,
+localStorage also intentionally holds device-local browser-practice history and
+progress; it never holds credentials. The approved Blue Eclipse/Ensemble Spark
+UI remains product-focused and does not surface organization or repository
+links.

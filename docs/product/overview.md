@@ -13,10 +13,11 @@ The name combines **kata**, deliberate practice that forges mastery, with
 
 ## Product pillars
 
-1. **Practice:** structured ML/DS problems with sample and hidden test cases.
-2. **Feedback:** immediate verdicts, runtime, memory, and submission history.
-3. **Progress:** solved state, streaks, difficulty coverage, topic coverage, and
-   leaderboards derived from real submissions.
+1. **Practice:** structured ML/DS problems with samples and difficulty-sized
+   practice suites.
+2. **Feedback:** immediate local verdicts, runtime, and device-local history.
+3. **Progress:** solved state and difficulty/topic coverage; durable ranked
+   progress follows with isolated server execution.
 4. **Guidance:** curated learning and interview tracks connected to relevant
    problem sets.
 5. **Competition:** timed contests, registration, and ranked standings.
@@ -38,7 +39,7 @@ The name combines **kata**, deliberate practice that forges mastery, with
 - Login and signup
 - Dashboard and progress views
 - Problem catalog and Monaco-based solve arena
-- Run, submit, and submission history data paths
+- Browser Run/Submit and device-local practice history
 - Competition list/detail, registration, and leaderboard display
 - Learning and interview tracks
 - Profile and avatar editing
@@ -48,7 +49,8 @@ The name combines **kata**, deliberate practice that forges mastery, with
 
 ## Explicit non-claims
 
-The current deployment must not be marketed as a fully live judge until P0
-launch gates close. Billing, team/organization administration, email
-verification, password recovery, and plagiarism detection are not complete
-production capabilities.
+The current public release is a practice beta, not an adversarial ranked judge:
+browser-delivered tests can be inspected and local history is device-specific.
+Ranked contests, billing, team/organization administration, email verification,
+password recovery, and plagiarism detection are not complete production
+capabilities.

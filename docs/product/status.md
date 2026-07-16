@@ -1,41 +1,53 @@
 # Current product status
 
-**Snapshot:** 2026-07-13
+**Snapshot:** 2026-07-16
 
-## Implemented and verified locally
+## Public free beta
 
-- Approved Blue Eclipse/Ensemble Spark product UI retained
-- Same-origin Next.js BFF with production cookie-only sessions
-- Rotating/revocable Session records and account lifecycle operations
-- Durable Mongo evaluation jobs, separate worker, retry/dead-letter/heartbeat
-- Async Judge0 polling with resource limits and bounded concurrency
-- Idempotent submission/status/cancellation contract
-- Contest eligibility, attribution and exactly-once first-solve scoring
-- Atomic-version testcase authoring and JSON program I/O contract
-- Distributed Redis throttling, per-user execution quota, input guard
-- Request IDs, structured logs, Admin audit, liveness/readiness
-- Node 24 non-root frontend/backend images and zero production audit findings
-- CSP/HSTS/privacy headers, metadata, robots and sitemap
-- Full-history secret scanning and public visibility for all six repositories
-- Container smoke: BFF → API → Mongo/Redis → worker → Judge simulator → verdict
-- Frontend PRs 31/32 and backend PR 22 merged with green Actions and deployment checks
+- Frontend: [https://katalume.vercel.app](https://katalume.vercel.app), Vercel
+  production deployment `dpl_J9yMYKKKMuvDSSAT6EohP2zYRa2G` (`Ready`)
+- API: [https://katalume-api.onrender.com](https://katalume-api.onrender.com),
+  Render free web service (`live`)
+- Data: MongoDB Atlas free cluster with 126 published problems and 3,486 active,
+  deterministic testcases
+- Distributed limits: Upstash Redis free tier over TLS
+- Authentication: email/password and Google OAuth; Google is external and in
+  production. GitHub remains disabled until its client secret is generated.
+- Execution: pinned local CPython/Pyodide worker in the browser. The public API
+  intentionally reports `execution: disabled` and rejects server run/submit.
 
-## Hosted state still requiring deployment work
+The free beta is intentionally a practice product. Browser execution records
+progress and history locally; ranked contests and durable server verdicts stay
+disabled until isolated execution capacity is funded and proven.
 
-- Existing Vercel production alias predates this hardening and lacks required
-  production configuration.
-- The merged frontend was preview-deployed successfully after repository
-  visibility changed; production still needs explicit environment configuration.
-- Required branch rules and release approvals still need owner configuration.
-- No managed production backend/worker/Judge0 deployment is recorded.
-- No custom domain, centralized monitoring evidence, backup restore, load test,
-  or rollback drill is recorded.
-- Email verification/recovery and mandatory Admin MFA are not complete.
-- Two exact passwords existed in removed legacy Judge0 history; scanning now
-  pins only those fingerprints, but any environment that used them must rotate.
+## Verified release evidence
 
-## Readiness
+- Frontend PRs 40 and 41 merged with lint, typecheck, 31 unit tests, production
+  build, 8 Playwright journeys, Gitleaks, dependency audit, and Vercel checks
+- Backend PR 28 merged with 23 suites / 140 tests and Gitleaks
+- Public `/health` and `/ready` return `200`; readiness reports Mongo and Redis
+  healthy
+- Public same-origin BFF returns all 126 problems and exposes only Google from
+  `/api/auth/providers`
+- Real Chrome smoke: account lifecycle, 126-problem catalog, local CPython
+  compile, 2/2 sample tests, and 8/8 Easy practice tests accepted
+- Disposable launch account and credentials removed after the smoke test
+- `main` and `develop` frontend trees are identical at release
 
-Application architecture is beta-capable; production infrastructure and owner
-controls are not yet proven. The authoritative decision remains
-[Production readiness](../launch/readiness.md).
+## Free-tier constraints
+
+- Render sleeps after inactivity and may take roughly a minute to wake.
+- Render shared outbound CIDRs are allow-listed in Atlas; Atlas is not open to
+  `0.0.0.0/0`.
+- Free Atlas, Upstash, Render, and Vercel quotas are hard launch limits, not an
+  SLO-backed production platform.
+- Central error monitoring, email verification/recovery, backup restore drills,
+  load tests, and formal on-call remain open.
+
+## Paid migration path
+
+The durable Mongo EvaluationJob worker and private authenticated Judge0 path
+remain in the backend behind `EXECUTION_MODE=judge0`. Moving to paid execution
+requires isolated hosts, queue/worker deployment, Judge0 stores, network denial,
+capacity tests, monitoring, and recovery evidence. The browser practice path can
+remain as a low-latency Run mode after server Submit is enabled.
