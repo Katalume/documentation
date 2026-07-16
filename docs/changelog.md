@@ -21,6 +21,14 @@
 - Configured GitHub OAuth in Render, deployed the provider without exposing its
   credentials, and verified the live GitHub authorization and Vercel callback
   flow.
+- Activated the `ml-problems` content pipeline with secret-isolated GitHub
+  synchronization and imported 72 additional problems / 1,353 testcases
+  without collisions or unintended archives.
+- Expanded production to 198 problems and 4,839 active testcases.
+- Added live, versioned browser-practice suite delivery so repository-imported
+  problems execute without rebuilding the frontend catalog.
+- Production browser verification passed imported Easy, Medium, and Hard
+  submissions at 9/9, 22/22, and 40/40; disposable accounts were deleted.
 - Completed a real public Chrome smoke (2/2 samples and 8/8 practice tests) and
   deleted the disposable account and credentials afterward.
 

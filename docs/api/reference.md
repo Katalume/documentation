@@ -34,15 +34,18 @@ backend, where paths are relative to `/api` unless noted.
 
 | Method | Path | Access | Behavior |
 |---|---|---|---|
-| `GET` | `/problems` | Optional user | Tag filter, user status, cursor/limit, max 100 |
+| `GET` | `/problems` | Optional user | Tag filter, user status, cursor/limit, max 200 |
 | `GET` | `/problems/:slug` | Optional user | Detail/count; editorial only for Admin/accepted solver |
+| `GET` | `/problems/:slug/practice` | Public | Active versioned browser-practice cases; `no-store` |
 | `POST` | `/problems` | Admin | Create problem and bounded testcases |
 | `PUT` | `/problems/:id` | Admin | Optimistic content and atomic-version testcase switch |
 | `DELETE` | `/problems/:id` | Admin | Delete problem/testcases |
 
-Problem programs use a deterministic JSON stdin/stdout contract. Testcase
-versions publish by a single Problem pointer switch, so workers see either the
-old or new set and never a partial edit.
+Browser-practice programs define `solve(payload)` and return a JSON-compatible
+value. The practice endpoint intentionally delivers the full deterministic
+suite because browser execution is a non-adversarial practice mode, not ranked
+judging. Testcase versions publish by a single Problem pointer switch, so
+clients see either the old or new set and never a partial edit.
 
 ## Execution and submissions
 

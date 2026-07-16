@@ -46,10 +46,11 @@ judging. A user controls their browser and can inspect client-delivered tests.
 
 ## Practice evaluation flow
 
-1. The live API supplies problem content and public examples; the versioned
-   frontend catalog supplies the matching local practice suite.
-2. Run evaluates the two public samples. Submit evaluates all practice cases:
-   8 Easy, 25 Medium, or 50 Hard.
+1. The live API supplies problem content plus the active versioned browser
+   practice suite. Mock development continues using the bundled frontend
+   catalog.
+2. Run evaluates public samples. Submit evaluates every client-delivered
+   practice case for the problem.
 3. A disposable worker loads pinned CPython, imports the user's `solve(payload)`,
    executes JSON cases, and applies tolerant numeric comparison.
 4. The UI stores accepted history and progress locally and labels the result

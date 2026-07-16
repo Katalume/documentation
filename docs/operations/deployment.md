@@ -46,10 +46,10 @@ COOKIE_SAME_SITE=lax
 MONGO_POOL_SIZE=5
 ```
 
-Set Mongo, Redis, JWT, origin, frontend, and OAuth values in Render; never place
-their values in `render.yaml` or shell history. `REDIS_URL` must be Upstash's TCP
-TLS URL (`rediss://...`), not its REST token. Seed content from a trusted local
-environment because Render free does not provide paid pre-deploy jobs.
+Set Mongo, Redis, JWT, origin, frontend, OAuth, and
+`PROBLEMS_IMPORT_TOKEN` values in Render; never place their values in
+`render.yaml` or shell history. `REDIS_URL` must be Upstash's TCP TLS URL
+(`rediss://...`), not its REST token.
 
 ```bash
 npm ci
@@ -58,8 +58,13 @@ npm run migrate
 npm run seed
 ```
 
-The seed is versioned and idempotent. Current expected production totals are
-126 problems and 3,486 active testcases.
+The seed and repository import are versioned and idempotent. Current expected
+production totals are 198 problems and 4,839 active testcases.
+
+`ml-problems` stores matching `KATALUME_IMPORT_URL` and
+`KATALUME_IMPORT_TOKEN` GitHub secrets. Its workflow validates repository code
+without secrets, uploads an immutable bundle, and imports it from a separate
+secret-bearing job that never checks out or executes repository code.
 
 ### Network controls
 
@@ -78,8 +83,9 @@ curl -fsS https://katalume.vercel.app/api/auth/providers
 ```
 
 Expected results: health and ready `200`, Mongo/Redis true, server execution
-disabled, 126 BFF problems, and Google listed. Complete an actual browser Run
-and Submit after every execution-runtime change.
+disabled, 198 BFF problems, and Google plus GitHub listed. Verify
+`GET /api/problems/:slug/practice` and complete an actual browser Run and Submit
+after every execution-runtime or content-delivery change.
 
 ## Free-tier behavior
 

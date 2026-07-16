@@ -47,7 +47,8 @@ private Judge0 remain the future server-submit path.
 | Repository | Purpose | Canonical branch/state |
 |---|---|---|
 | `frontend` | Next.js product, browser Python, and same-origin BFF | Public; PR 40 merged to `develop`, PR 41 synced to `main` |
-| `backend-api` | Express/Mongo API and future evaluation worker/Judge0 path | Public; catalog PR 28 merged to `main` |
+| `backend-api` | Express/Mongo API and future evaluation worker/Judge0 path | Public; production through PR 31 |
+| `ml-problems` | Problems-as-code, sandbox validation, and catalog synchronization | Public; 72 pipeline-managed problems |
 | `documentation` | This source of truth | `main` |
 
 All six organization repositories are public.

@@ -15,7 +15,7 @@ production operations, security expectations, and the July 20, 2026 launch
 plan.
 
 Current public beta: [https://katalume.vercel.app](https://katalume.vercel.app)
-with 126 practice problems and pinned in-browser Python execution. Server-side
+with 198 practice problems and pinned in-browser Python execution. Server-side
 ranked execution remains intentionally disabled.
 
 ## Quick start
@@ -33,6 +33,7 @@ Open `http://127.0.0.1:8000`.
 
 - Product behavior: public `frontend` repository
 - API behavior: public `backend-api` repository
+- Practice content: public `ml-problems` repository
 - Product and operational documentation: this repository
 - Launch gates: [`docs/launch/readiness.md`](docs/launch/readiness.md)
 - Deadline plan: [`docs/launch/july-20-plan.md`](docs/launch/july-20-plan.md)

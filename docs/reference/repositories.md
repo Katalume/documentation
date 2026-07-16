@@ -27,7 +27,8 @@ Key paths:
 
 - Express/Mongoose API plus disabled-by-default Judge0 upgrade path
 - Default branch: `main`
-- Public repository; catalog PR 28 is merged to `main`
+- Public repository; catalog/import/browser-practice PRs through 31 are merged
+  to `main`
 
 Key paths:
 
@@ -39,7 +40,24 @@ Key paths:
 - `src/workers` — evaluation worker entrypoint
 - `scripts/generateProblemCatalog.js` — deterministic catalog generator
 - `data/problem-catalog.json` — 126 versioned problems and testcases
+- `src/routes/import.routes.js` — authenticated problems-as-code synchronization
+- `src/services/problemImport.service.js` — atomic versioned catalog import
 - `tests` — Jest/Supertest integration tests
+
+### `Katalume/ml-problems`
+
+- Canonical problems-as-code source for pipeline-managed content
+- Default branch: `main`
+- 72 problems / 1,353 testcases at the current release
+- CI validates the exact browser `solve(payload)` sandbox contract
+- A secret-isolated artifact workflow synchronizes the catalog into the API
+
+Key paths:
+
+- `problems/<slug>` — metadata, statement, starter, reference solution, tests
+- `tools/validate.py` — schema, sandbox, and reference-solution validation
+- `tools/export.py` — authoritative import bundle with removal archival
+- `.github/workflows/sync.yml` — isolated build and production sync jobs
 
 ### `Katalume/documentation`
 
@@ -47,15 +65,14 @@ Key paths:
 - Default branch: `main`
 - Built with MkDocs Material
 
-All six organization repositories are public. `evaluation-engine` and
-`ml-problems` remain reserved/empty; active evaluation/content implementations
-currently live in `backend-api`.
+All six organization repositories are public. `ml-problems` is active;
+`evaluation-engine` remains reserved for a future isolated execution service.
 
 ## Reserved repositories
 
 The unused backend Vite client and duplicate problem/contest services were
-removed during hardening. Empty `evaluation-engine` and `ml-problems`
-repositories should remain reserved or be archived once ownership is decided.
+removed during hardening. The empty `evaluation-engine` repository remains
+reserved until isolated server execution is funded.
 
 ## Branch strategy recommendation
 

@@ -13,7 +13,7 @@ npm run audit:production
 docker build -t katalume-frontend .
 ```
 
-Verified release baseline: 31 unit/component tests, eight Playwright browser
+Verified release baseline: 32 unit/component tests, eight Playwright browser
 journeys, strict TypeScript/lint, production build, zero dependency findings,
 and a non-root Node 24 container. Coverage includes the OAuth redirect/cookie
 proxy, browser-Python worker contract, live catalog normalization, local
@@ -22,7 +22,8 @@ progress/history, and free-beta contest restrictions.
 Playwright uses deterministic product data for repeatable UI flows and includes
 a real pinned-Pyodide acceptance path. The 2026-07-16 public smoke additionally
 verified Vercel BFF → Render API → Atlas/Upstash, account lifecycle, the complete
-126-problem list, 2/2 samples, and an 8/8 Easy practice submission in Chrome.
+198-problem list, and imported Easy/Medium/Hard submissions at 9/9, 22/22, and
+40/40 through the production browser worker.
 
 ## Backend
 
@@ -33,7 +34,7 @@ npm audit --omit=dev --audit-level=high
 docker build -t katalume-backend .
 ```
 
-Verified release baseline: 23 suites / 140 tests. CI enforces minimum global
+Verified release baseline: 23 suites / 145 tests. CI enforces minimum global
 coverage of 80% statements, 65% branches, 80% functions and 80% lines. Tests
 cover catalog generation and seed idempotency in addition to session rotation/reuse/revocation, roles and
 ownership, input guards, idempotency, job claim/retry/dead-letter, Judge0
