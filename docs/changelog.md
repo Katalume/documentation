@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-07-19
+
+- Added the disabled-by-default, provider-neutral subscription architecture for
+  weekly, monthly, yearly, and lifetime INR offers.
+- Defined immutable offer versions, normalized subscription/payment state,
+  internal entitlement grants, signed durable webhooks, reconciliation,
+  India-first payment requirements, provider migration, tests, observability,
+  and activation gates.
+- Kept pricing, provider selection, checkout, secrets, and paid entitlement
+  enforcement explicitly unimplemented for the free beta.
+
 ## 2026-07-16
 
 - Published the zero-cost beta at `katalume.vercel.app` with a live same-origin

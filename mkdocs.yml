@@ -71,6 +71,7 @@ nav:
       - Frontend: architecture/frontend.md
       - Backend: architecture/backend.md
       - Data model: architecture/data-model.md
+      - Subscription readiness: architecture/subscriptions.md
       - Decisions: architecture/decisions.md
   - User and admin guides:
       - User guide: guides/user-guide.md
