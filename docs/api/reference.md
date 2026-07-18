@@ -34,9 +34,9 @@ backend, where paths are relative to `/api` unless noted.
 
 | Method | Path | Access | Behavior |
 |---|---|---|---|
-| `GET` | `/problems` | Optional user | Tag filter, user status, cursor/limit, max 200 |
-| `GET` | `/problems/:slug` | Optional user | Detail/count; editorial only for Admin/accepted solver |
-| `GET` | `/problems/:slug/practice` | Public | Active versioned browser-practice cases; `no-store` |
+| `GET` | `/problems` | Optional user | Tag filter, user status, cursor/limit, max 200; annotates `accessTier` and `locked` |
+| `GET` | `/problems/:slug` | Optional user | Detail/count; editorial only for Admin/accepted solver; enforced paid content returns `402 PLUS_REQUIRED` |
+| `GET` | `/problems/:slug/practice` | Optional user | Active versioned browser-practice cases; enforced paid content returns `402 PLUS_REQUIRED`; `no-store` |
 | `POST` | `/problems` | Admin | Create problem and bounded testcases |
 | `PUT` | `/problems/:id` | Admin | Optimistic content and atomic-version testcase switch |
 | `DELETE` | `/problems/:id` | Admin | Delete problem/testcases |
@@ -46,6 +46,25 @@ value. The practice endpoint intentionally delivers the full deterministic
 suite because browser execution is a non-adversarial practice mode, not ranked
 judging. Testcase versions publish by a single Problem pointer switch, so
 clients see either the old or new set and never a partial edit.
+
+The launch free set is a stable server-owned allowlist of 60 problems. Paid
+enforcement is independently controlled by `PAID_ENTITLEMENTS_ENFORCED`; while
+it is false, access labels are visible but no problem is blocked.
+
+## Billing and membership
+
+| Method | Path | Access | Behavior |
+|---|---|---|---|
+| `GET` | `/billing/offers` | Public | Four immutable INR offer snapshots and safe runtime flags |
+| `GET` | `/billing/summary` | User | Effective Free/Plus/Lumus entitlement and current billing state |
+| `POST` | `/billing/checkouts` | User | Idempotent hosted Cashfree subscription/order session; requires Indian phone |
+| `POST` | `/billing/subscriptions/:id/cancel` | Owner | Stop future renewals while preserving the paid period |
+| `POST` | `/billing/webhooks/cashfree` | Signed provider | Raw-body HMAC, replay/amount/currency checks, fulfillment and full Lumus refund revocation |
+
+Checkout accepts only an `offerKey`; price, currency and benefits are resolved
+server-side. The return page is informational. Only a verified webhook creates
+or revokes an entitlement. All billing, checkout, webhook processing and paid
+enforcement flags default to false.
 
 ## Execution and submissions
 

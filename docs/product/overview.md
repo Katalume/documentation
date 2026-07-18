@@ -51,6 +51,7 @@ The name combines **kata**, deliberate practice that forges mastery, with
 
 The current public release is a practice beta, not an adversarial ranked judge:
 browser-delivered tests can be inspected and local history is device-specific.
-Ranked contests, billing, team/organization administration, email verification,
-password recovery, and plagiarism detection are not complete production
-capabilities.
+Billing code is deployed dark and cannot charge until its commercial activation
+gates are completed. Ranked contests, team/organization administration, email
+verification, password recovery, and plagiarism detection are not complete
+production capabilities.

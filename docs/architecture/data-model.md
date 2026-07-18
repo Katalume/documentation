@@ -6,6 +6,9 @@ erDiagram
     USER ||--o{ SESSION : owns
     USER ||--o{ EVALUATION_JOB : queues
     USER ||--o{ AUDIT_EVENT : acts
+    USER ||--o{ ENTITLEMENT_GRANT : receives
+    USER ||--o{ BILLING_SUBSCRIPTION : owns
+    USER ||--o{ BILLING_PURCHASE : owns
     USER }o--o{ CONTEST : registers
     USER ||--o{ LEADERBOARD : ranks
     PROBLEM ||--o{ SUBMISSION : receives
@@ -62,6 +65,31 @@ erDiagram
       date expiresAt
       date revokedAt
       string replacedBy
+    }
+    ENTITLEMENT_GRANT {
+      ObjectId userId
+      string tier
+      stringArray benefits
+      string sourceType
+      ObjectId sourceId
+      date startsAt
+      date endsAt
+      string status
+    }
+    BILLING_SUBSCRIPTION {
+      ObjectId userId
+      string offerKey
+      string providerSubscriptionId
+      string status
+      date currentPeriodEnd
+      boolean cancelAtPeriodEnd
+    }
+    BILLING_PURCHASE {
+      ObjectId userId
+      string offerKey
+      string providerOrderId
+      string status
+      date capturedAt
     }
     EVALUATION_JOB {
       ObjectId userId

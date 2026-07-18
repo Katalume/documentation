@@ -88,6 +88,7 @@ nav:
       - Observability: operations/observability.md
       - Security: operations/security.md
       - Runbooks: operations/runbooks.md
+      - Billing activation: operations/billing-activation.md
   - Launch:
       - Production readiness: launch/readiness.md
       - July 20 plan: launch/july-20-plan.md

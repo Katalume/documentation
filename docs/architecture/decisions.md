@@ -44,6 +44,15 @@ Use short-lived cookie access tokens and rotated, hashed, server-tracked refresh
 Sessions. Route live browser API traffic through the same-origin Next.js BFF;
 never persist or return production bearer credentials to browser JavaScript.
 
+### ADR-010 — Provider-neutral billing and internal entitlements
+
+Use Cashfree as the initial India-first adapter while keeping Katalume's
+server-side entitlement ledger as the source of truth for access. Weekly,
+monthly, yearly and Lumus lifetime offers are versioned independently of the
+provider. Browser callbacks never grant access; signed, replay-safe webhooks
+do. Checkout and enforcement use independent safe-default feature flags. See
+[Subscription readiness](subscriptions.md).
+
 ## Required before launch
 
 ### ADR-008 — Controlled launch scope
@@ -57,12 +66,3 @@ traffic only after production-like evidence passes.
 Promote the same immutable release from staging to production. Production
 requires explicit approval, post-deploy smoke tests, observable health, and a
 tested rollback.
-
-### ADR-010 — Provider-neutral billing and internal entitlements
-
-Keep billing disabled during the free beta. When commercial activation is
-approved, treat the payment provider as the source of truth for money movement
-and Katalume's server-side entitlement ledger as the source of truth for access.
-All provider calls sit behind an adapter, browser callbacks never grant access,
-and webhook processing is signed, idempotent, durable, ordered, and
-reconcilable. See [Subscription readiness](subscriptions.md).
