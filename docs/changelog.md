@@ -2,14 +2,17 @@
 
 ## 2026-07-19
 
-- Added the disabled-by-default, provider-neutral subscription architecture for
-  weekly, monthly, yearly, and lifetime INR offers.
-- Defined immutable offer versions, normalized subscription/payment state,
-  internal entitlement grants, signed durable webhooks, reconciliation,
-  India-first payment requirements, provider migration, tests, observability,
-  and activation gates.
-- Kept pricing, provider selection, checkout, secrets, and paid entitlement
-  enforcement explicitly unimplemented for the free beta.
+- Implemented a disabled-by-default, provider-neutral membership system with
+  weekly, monthly, yearly, and Lumus lifetime INR offers.
+- Added Cashfree hosted checkout adapters, server-owned immutable prices,
+  signed/replay-safe webhooks, internal entitlement grants, cancellation,
+  full-lifetime-refund revocation, privacy export/deletion handling, indexes,
+  tests, and a staged activation runbook.
+- Added a stable 60-problem Free set, Plus catalog labels and gates,
+  Plus-exclusive Interview Tracks shell, membership management, and enhanced
+  Progress/Profile panels. Learn and Competitions remain unchanged.
+- Kept checkout, webhook processing, and paid enforcement disabled until
+  merchant onboarding, legal/tax approval, sandbox proof, and an owner canary.
 
 ## 2026-07-16
 

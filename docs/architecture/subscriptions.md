@@ -1,13 +1,42 @@
 # Subscription readiness
 
-**Status:** target-state design only  
-**Runtime state:** disabled  
-**Pricing state:** undecided  
-**Payment provider state:** unselected
+**Status:** implementation complete; commercial activation pending
 
-Katalume must not display checkout, collect payment details, create mandates, or
-grant paid access from a client-side callback until every activation gate in
-this document is closed. The public beta remains free.
+**Runtime state:** disabled by safe-default feature flags
+
+**Pricing state:** version 1 launch configuration
+
+**Payment provider state:** Cashfree selected for the India-first adapter
+
+Katalume may display its membership catalog while checkout is disabled, but it
+must not create mandates or orders until every activation gate in this document
+is closed. A browser redirect never grants paid access. The production beta
+remains fully accessible until paid-entitlement enforcement is separately
+enabled.
+
+## Implemented membership model
+
+- Free includes a stable, topic-balanced set of 60 problems: 30 Easy, 20 Medium
+  and 10 Hard.
+- Plus includes every current and future problem, Interview Tracks, premium
+  Progress intelligence, and the premium Profile identity layer.
+- Plus is offered weekly, monthly, or yearly.
+- Lumus is the one-time lifetime tier and carries the same all-access benefits.
+- Competitions remain Coming Soon and are outside the billing gate.
+- Learn remains outside this rollout until its content owner completes the
+  learning experience and the benefit split is reviewed.
+
+| Offer key | Display name | Price | Collection |
+|---|---|---:|---|
+| `plus_weekly_in_v1` | Plus Weekly | ₹79 weekly | Cashfree periodic subscription |
+| `plus_monthly_in_v1` | Plus Monthly | ₹249 monthly | Cashfree periodic subscription |
+| `plus_yearly_in_v1` | Plus Yearly | ₹1,999 yearly | Cashfree periodic subscription |
+| `lumus_lifetime_in_v1` | Lumus Lifetime | ₹4,999 once | Cashfree one-time order |
+
+These are immutable version 1 offer snapshots in code, not permission for the
+production account to charge. Changing a live price requires a new offer key.
+The amounts and tax display still require owner and professional review before
+activation.
 
 ## Design goals
 
@@ -19,11 +48,10 @@ this document is closed. The public beta remains free.
   later without rewriting product authorization.
 - Preserve a useful free tier and avoid locking learning history behind payment.
 
-## Explicit non-goals for this phase
+## Explicit non-goals for activation
 
-- No prices, discounts, trials, or paid feature limits are approved.
-- No provider SDK, API key, webhook secret, checkout route, or billing UI is
-  added to production.
+- No discount, trial, coupon, proration, upgrade/downgrade, or family plan is
+  included in version 1.
 - No payment-method data is stored by Katalume.
 - No claim is made that lifetime access means the service must operate forever.
 - This document is engineering readiness, not tax or legal advice.
@@ -64,17 +92,20 @@ unit-economics review.
 7. Manual support grants must be separate, attributed, expiring where
    appropriate, and auditable.
 
-## Target data model
+## Production data model
 
 All identifiers below are internal opaque IDs unless prefixed with
-`provider`.
+`provider`. The shipped version implements the customer, subscription,
+purchase, webhook-event, and entitlement-grant subset. Payment/refund ledgers,
+tax profiles, dead-letter automation, and support reconciliation remain
+activation gates rather than claims about the current code.
 
 ### `BillingCustomer`
 
 | Field | Purpose |
 |---|---|
 | `userId` | Unique Katalume user |
-| `provider` | Adapter key, for example `razorpay` |
+| `provider` | Adapter key, initially `cashfree` |
 | `providerCustomerId` | Encrypted or access-restricted external reference |
 | `billingEmail` | Invoice/contact address; separate from login changes |
 | `taxProfile` | Optional legal name, country/state, postal code, GSTIN after validation |
@@ -176,36 +207,28 @@ during a short provider outage.
 
 ## Backend module boundary
 
-Future billing code should live behind a provider-neutral boundary:
+Billing code lives behind this provider-neutral boundary:
 
 ```text
 src/billing/
-  billing.service
-  entitlement.service
-  offer.repository
-  webhook.service
-  reconciliation.service
+  billing.service.js
+  entitlement.service.js
   providers/
-    provider.interface
-    razorpay.adapter
+    cashfree.adapter.js
 ```
 
-The adapter contract should cover:
+The current adapter covers:
 
 ```text
-createCustomer
 createCheckout
-fetchSubscription
 cancelSubscription
-createRefund
 verifyWebhook
-normalizeWebhook
 ```
 
 Controllers must not call a provider SDK directly. Provider objects must not
 leak into user or authorization models.
 
-## Planned API surface
+## Implemented API surface
 
 All mutating endpoints require an authenticated user, CSRF protection where
 applicable, distributed rate limits, and an idempotency key.
@@ -215,10 +238,8 @@ applicable, distributed rate limits, and an idempotency key.
 | `GET /api/billing/offers` | Return active, server-approved offer snapshots |
 | `GET /api/billing/summary` | Return the user's normalized billing and entitlement state |
 | `POST /api/billing/checkouts` | Create a provider-hosted checkout/mandate flow |
-| `POST /api/billing/subscriptions/:id/cancel` | Cancel now or at period end |
-| `POST /api/billing/subscriptions/:id/resume` | Resume if the provider permits it |
-| `POST /api/billing/webhooks/:provider` | Receive signed provider events; no user auth |
-| `POST /api/admin/billing/reconcile/:id` | Restricted, audited repair |
+| `POST /api/billing/subscriptions/:id/cancel` | Cancel future renewals; retain the already-paid access window |
+| `POST /api/billing/webhooks/cashfree` | Receive signed Cashfree events; no user auth |
 
 The frontend should learn access through `/api/billing/summary`; it must not
 infer paid status from query parameters, local storage, or a provider response.
@@ -230,7 +251,6 @@ sequenceDiagram
     participant U as User browser
     participant K as Katalume API
     participant P as Payment provider
-    participant W as Billing worker
 
     U->>K: Create checkout (offerKey + idempotency key)
     K->>K: Validate active offer and snapshot terms
@@ -240,10 +260,10 @@ sequenceDiagram
     U->>P: Complete provider-controlled payment flow
     P-->>U: Return to informational status page
     P->>K: Signed webhook
-    K->>K: Verify signature and persist event once
-    K-->>P: 2xx after durable receipt
-    W->>K: Normalize event and update billing state atomically
-    W->>K: Create/revoke entitlement grant
+    K->>K: Verify raw-body signature and acquire event once
+    K->>K: Validate amount/currency and update billing state
+    K->>K: Create or revoke entitlement grant
+    K-->>P: 2xx after processing
     U->>K: Fetch billing summary
     K-->>U: Verified entitlement
 ```
@@ -255,12 +275,12 @@ Webhook processing rules:
    side effects.
 3. Persist the unique event and payload hash before acknowledging it.
 4. Return success for an identical replay.
-5. Process asynchronously with bounded retries and dead-letter alerting.
-6. Lock the billing aggregate and reject stale state transitions using provider
-   occurrence time plus provider sequence/version when available.
-7. Apply billing state, payment state, and entitlement changes in one database
-   transaction where supported.
-8. Reconcile uncertain events against the provider API.
+5. Acquire the event with a compare-and-set processing lease so concurrent
+   deliveries do not execute twice; a stale lease may be retried.
+6. Reject stale subscription-state transitions using provider occurrence time.
+7. Validate the server-owned amount and currency before every grant.
+8. Before live activation, add scheduled provider reconciliation and alerts for
+   uncertain multi-write failures.
 
 ## India-first payment requirements
 
@@ -302,6 +322,8 @@ transaction; do not recompute old invoices from current settings.
 - Enforce server-side offer lookup; reject client-supplied amounts, currency,
   tier, tax, or provider plan IDs.
 - Bind checkout ownership to the authenticated Katalume user.
+- Cancel renewable mandates before account deletion; anonymize billing contact
+  data retained for financial/legal records and remove product entitlements.
 - Tokenize through the provider and keep Katalume out of raw card/UPI data.
 - Redact provider payloads, email, phone, GSTIN, addresses, and failure detail
   from ordinary logs and error reporting.
@@ -327,16 +349,19 @@ paid entitlements, and enabling entitlement enforcement must not expose
 checkout. Unknown or missing configuration fails closed for new purchases while
 preserving already-verified access.
 
-Provider-specific configuration is added only after selection:
+Cashfree-specific configuration:
 
 ```text
-BILLING_<PROVIDER>_KEY_ID
-BILLING_<PROVIDER>_KEY_SECRET
-BILLING_<PROVIDER>_WEBHOOK_SECRET
-BILLING_<PROVIDER>_ACCOUNT_ID
+CASHFREE_CLIENT_ID
+CASHFREE_CLIENT_SECRET
+BILLING_WEBHOOK_URL
+BILLING_ENVIRONMENT=sandbox|production
 ```
 
-Do not create these variables or placeholder secrets in production yet.
+Secrets belong only in Render's secret store. `BILLING_WEBHOOK_URL` must be the
+direct public backend URL ending in `/api/billing/webhooks/cashfree`; do not
+route it through the frontend BFF because signature verification uses the exact
+raw request bytes and Cashfree headers.
 
 ## Testing strategy
 
@@ -354,11 +379,11 @@ Do not create these variables or placeholder secrets in production yet.
 
 - checkout request retry with one idempotency key;
 - duplicate/out-of-order webhook delivery;
-- event persisted but worker interrupted before state update;
+- event acquired but the API interrupted before state update;
 - provider timeout after an unknown checkout result;
 - successful payment with delayed webhook;
 - failed renewal, recovery, cancellation, refund, chargeback, and dispute;
-- database transaction failure at each write boundary;
+- database failure at each write boundary and stale processing-lease recovery;
 - secret rotation and test/live environment isolation.
 
 ### Production-like proof
@@ -403,17 +428,17 @@ Never overwrite provider A identifiers with provider B identifiers.
 
 ## Activation gates
 
-- [ ] Free-versus-paid benefits approved from user research
-- [ ] Weekly/monthly/yearly/lifetime prices and tax display approved
+- [x] Free-versus-paid benefits implemented behind independent enforcement
+- [ ] Weekly/monthly/yearly/lifetime prices and tax display approved for live sale
 - [ ] Lifetime terms and business liability approved
-- [ ] Provider selected after capability, onboarding, support, and total-cost review
+- [x] Cashfree selected as the initial India-first adapter
 - [ ] Legal entity, bank/settlement, KYC, GST, invoices, terms, privacy, refunds, and cancellation approved
-- [ ] Backend models, adapter, APIs, workers, migrations, and indexes implemented
-- [ ] Frontend pricing, checkout, manage-billing, invoice, and recovery UX implemented
-- [ ] Webhook signature, idempotency, ordering, retry, and reconciliation tests green
+- [x] Backend models, adapter, APIs, access checks, and indexes implemented
+- [x] Frontend pricing, hosted checkout, membership, cancellation, and recovery UX implemented
+- [x] Webhook signature, replay, amount verification, subscription, and lifetime tests green
 - [ ] Test/live secrets and environments isolated
 - [ ] Support and finance runbooks rehearsed
-- [ ] Accessibility, mobile, localization, analytics-consent, and security review passed
+- [ ] Accessibility, mobile, localization, analytics-consent, and security review passed in staging
 - [ ] Staged test-mode and owner-only live canary passed
 - [ ] `BILLING_ENABLED` separately approved for production
 
@@ -424,8 +449,10 @@ flags remain false.
 
 - [NPCI: UPI AutoPay](https://www.npci.org.in/product/autopay)
 - [Reserve Bank of India: e-mandate framework index/circular](https://www.rbi.org.in/scripts/bs_circularindexdisplay.aspx/Scripts/BS_CircularIndexDisplay.aspx?Id=12722)
-- [Razorpay: subscription webhook events](https://razorpay.com/docs/payments/subscriptions/subscribe-to-webhooks/)
-- [Razorpay: webhook processing overview](https://razorpay.com/docs/webhooks/)
+- [Cashfree: subscription FAQ](https://www.cashfree.com/docs/payments/subscription/faq)
+- [Cashfree: webhook signatures](https://www.cashfree.com/docs/payments/subscription/webhook-signature)
+- [Cashfree: subscription API](https://www.cashfree.com/docs/api-reference/payments/latest/subscription/overview)
+- [Cashfree: hosted web checkout](https://www.cashfree.com/docs/payments/online/web/redirect)
 - [GST portal: e-invoicing glossary](https://tutorial.gst.gov.in/downloads/news/pamphlet_e_invoicing_glossary_updated_17_08_2023_approved_final.pdf)
 
 These links are implementation inputs, not permanent constants. Re-check them

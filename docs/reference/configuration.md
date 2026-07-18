@@ -39,6 +39,24 @@ or non-HTTPS URLs.
 | `GOOGLE_CLIENT_ID/SECRET` | Required for Google | Provider credentials |
 | `GITHUB_CLIENT_ID/SECRET` | Both or neither | Provider stays hidden if incomplete |
 
+## Backend billing profile
+
+Billing deploys dark. The defaults are:
+
+| Variable | Safe value | Purpose |
+|---|---:|---|
+| `BILLING_ENABLED` | `false` | Master billing integration gate |
+| `CHECKOUT_ENABLED` | `false` | Allows new provider orders and mandates |
+| `BILLING_WEBHOOK_PROCESSING_ENABLED` | `false` | Lets signed money events update the ledger |
+| `PAID_ENTITLEMENTS_ENFORCED` | `false` | Applies free-versus-paid product gates |
+| `BILLING_PROVIDER` | `disabled` | Set to `cashfree` only during activation |
+| `BILLING_ENVIRONMENT` | `sandbox` | Cashfree environment isolation |
+| `BILLING_WEBHOOK_URL` | Blank | Direct backend webhook URL |
+| `CASHFREE_CLIENT_ID/SECRET` | Blank secret | Server-side authentication; the Cashfree PG secret also verifies raw-body webhook HMACs |
+
+See [Billing activation](../operations/billing-activation.md) for the activation
+and rollback order.
+
 The Upstash REST token is not a Redis TCP password. Copy the TCP `REDIS_URL`
 from Upstash and validate it with `PING` without printing the value.
 
