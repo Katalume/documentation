@@ -57,9 +57,22 @@ it is false, access labels are visible but no problem is blocked.
 |---|---|---|---|
 | `GET` | `/billing/offers` | Public | Four immutable INR offer snapshots and safe runtime flags |
 | `GET` | `/billing/summary` | User | Effective Free/Plus/Lumus entitlement and current billing state |
+| `GET` | `/billing/receipts` | User | Verified payment receipts owned by the user; explicitly not tax invoices |
+| `GET` | `/billing/receipts/:id` | Owner | One owned payment receipt |
 | `POST` | `/billing/checkouts` | User | Idempotent hosted Cashfree subscription/order session; requires Indian phone |
 | `POST` | `/billing/subscriptions/:id/cancel` | Owner | Stop future renewals while preserving the paid period |
 | `POST` | `/billing/webhooks/cashfree` | Signed provider | Raw-body HMAC, replay/amount/currency checks, fulfillment and full Lumus refund revocation |
+
+Admin billing operations:
+
+| Method | Path | Behavior |
+|---|---|---|
+| `GET` | `/admin/billing/overview` | Safe flags, counts, captured totals, alert state, latest reconciliation |
+| `GET` | `/admin/billing/customers` | Bounded support search with masked phone and current product state |
+| `GET` | `/admin/billing/events` | Sanitized webhook event history; payload hashes and raw payloads omitted |
+| `GET` | `/admin/billing/alerts` | Open/resolved operational drift alerts |
+| `POST` | `/admin/billing/reconcile` | Audited reconciliation run; detects only and never repairs money/access |
+| `POST` | `/admin/billing/alerts/:id/resolve` | Audited operator acknowledgement |
 
 Checkout accepts only an `offerKey`; price, currency and benefits are resolved
 server-side. The return page is informational. Only a verified webhook creates

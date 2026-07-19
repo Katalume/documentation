@@ -13,6 +13,12 @@
   Progress/Profile panels. Learn and Competitions remain unchanged.
 - Kept checkout, webhook processing, and paid enforcement disabled until
   merchant onboarding, legal/tax approval, sandbox proof, and an owner canary.
+- Added a normalized payment-receipt ledger, account receipt history,
+  detect-only provider/internal reconciliation, persistent operations alerts,
+  and an audited, mutation-minimal Admin billing console.
+- Published checkout-linked draft Terms, Privacy, Refund, Billing Terms, About,
+  and Contact pages. Legal identity, grievance address, GST/invoice treatment,
+  settlement accounting, and policy approval remain activation gates.
 
 ## 2026-07-16
 

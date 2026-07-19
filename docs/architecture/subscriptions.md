@@ -279,8 +279,10 @@ Webhook processing rules:
    deliveries do not execute twice; a stale lease may be retried.
 6. Reject stale subscription-state transitions using provider occurrence time.
 7. Validate the server-owned amount and currency before every grant.
-8. Before live activation, add scheduled provider reconciliation and alerts for
-   uncertain multi-write failures.
+8. Scheduled and admin-triggered reconciliation compare internal
+   source/grant/receipt invariants and provider resource state, then persist
+   alerts. Reconciliation is detect-only: it never repairs entitlements,
+   issues refunds, or mutates Cashfree.
 
 ## India-first payment requirements
 
@@ -341,6 +343,7 @@ BILLING_ENABLED=false
 CHECKOUT_ENABLED=false
 BILLING_PROVIDER=disabled
 BILLING_WEBHOOK_PROCESSING_ENABLED=false
+BILLING_RECONCILIATION_ENABLED=false
 PAID_ENTITLEMENTS_ENFORCED=false
 ```
 
@@ -356,6 +359,8 @@ CASHFREE_CLIENT_ID
 CASHFREE_CLIENT_SECRET
 BILLING_WEBHOOK_URL
 BILLING_ENVIRONMENT=sandbox|production
+BILLING_RECONCILIATION_INTERVAL_MINUTES
+BILLING_RECONCILIATION_BATCH_SIZE
 ```
 
 Secrets belong only in Render's secret store. `BILLING_WEBHOOK_URL` must be the
@@ -436,6 +441,8 @@ Never overwrite provider A identifiers with provider B identifiers.
 - [x] Backend models, adapter, APIs, access checks, and indexes implemented
 - [x] Frontend pricing, hosted checkout, membership, cancellation, and recovery UX implemented
 - [x] Webhook signature, replay, amount verification, subscription, and lifetime tests green
+- [x] Payment receipt ledger, customer receipt history, internal/provider reconciliation, persistent alerts, and audited Admin billing console implemented
+- [x] Draft Terms, Privacy, Refund, Billing Terms, About, and Contact pages linked from checkout
 - [ ] Test/live secrets and environments isolated
 - [ ] Support and finance runbooks rehearsed
 - [ ] Accessibility, mobile, localization, analytics-consent, and security review passed in staging

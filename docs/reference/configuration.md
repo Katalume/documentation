@@ -48,14 +48,31 @@ Billing deploys dark. The defaults are:
 | `BILLING_ENABLED` | `false` | Master billing integration gate |
 | `CHECKOUT_ENABLED` | `false` | Allows new provider orders and mandates |
 | `BILLING_WEBHOOK_PROCESSING_ENABLED` | `false` | Lets signed money events update the ledger |
+| `BILLING_RECONCILIATION_ENABLED` | `false` | Starts scheduled provider/internal drift checks |
+| `BILLING_RECONCILIATION_INTERVAL_MINUTES` | `60` | Scheduler interval (5–1440 minutes) |
+| `BILLING_RECONCILIATION_BATCH_SIZE` | `100` | Maximum records per model checked in a run |
 | `PAID_ENTITLEMENTS_ENFORCED` | `false` | Applies free-versus-paid product gates |
 | `BILLING_PROVIDER` | `disabled` | Set to `cashfree` only during activation |
 | `BILLING_ENVIRONMENT` | `sandbox` | Cashfree environment isolation |
 | `BILLING_WEBHOOK_URL` | Blank | Direct backend webhook URL |
 | `CASHFREE_CLIENT_ID/SECRET` | Blank secret | Server-side authentication; the Cashfree PG secret also verifies raw-body webhook HMACs |
 
+The admin-only manual reconciliation endpoint remains available for internal
+ledger checks while billing is dark. Provider reads occur only after
+`BILLING_ENABLED=true` and `BILLING_PROVIDER=cashfree`; reconciliation never
+changes money, provider state, or entitlements automatically.
+
 See [Billing activation](../operations/billing-activation.md) for the activation
 and rollback order.
+
+Customer-facing policy identity is configured at frontend build time:
+
+| Variable | Purpose |
+|---|---|
+| `NEXT_PUBLIC_LEGAL_ENTITY_NAME` | Operator name shown in policy/contact copy; owner and counsel must approve |
+| `NEXT_PUBLIC_SUPPORT_EMAIL` | Public support and billing-contact address |
+
+These values are public by design and must never contain provider credentials.
 
 The Upstash REST token is not a Redis TCP password. Copy the TCP `REDIS_URL`
 from Upstash and validate it with `PING` without printing the value.
